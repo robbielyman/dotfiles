@@ -3,7 +3,7 @@
 system_type=$(uname -s)
 
 if [ "$system_type" = "Linux"]; then
-    if ! command -v nvim >/dev/null 2>&1; then
+    if [! command -v nvim >/dev/null 2>&1]; then
         echo "Installing neovim"
     fi
 
