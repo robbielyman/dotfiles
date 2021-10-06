@@ -2,6 +2,7 @@ return require('packer').startup(function(use)
 	use 'wbthomason/packer.nvim'
 	use 'arcticicestudio/nord-vim'
 	use 'lervag/vimtex'
+    use 'andweeb/presence.nvim'
 --  use '~/Documents/tex-nvim'
     use { 'kdheepak/tabline.nvim',
         requires = { { 'shadmansaleh/lualine.nvim', opt = true }, {'kyazdani42/nvim-web-devicons'} }
