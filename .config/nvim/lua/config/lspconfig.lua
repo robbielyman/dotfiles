@@ -41,6 +41,9 @@ local runtime_path = vim.split(package.path, ';')
 table.insert(runtime_path, "lua/?.lua")
 table.insert(runtime_path, "lua/?/init.lua")
 
+local libraries = vim.api.nvim_get_runtime_file("", true)
+table.insert(libraries, "/Users/rylee/Documents/norns/lua")
+
 require("lspconfig").sumneko_lua.setup {
     cmd = {sumneko_binary, "-E", sumneko_root_path .. "/main.lua"},
     settings = {
@@ -53,7 +56,7 @@ require("lspconfig").sumneko_lua.setup {
                 globals = {'vim'},
             },
             workspace = {
-                library = vim.api.nvim_get_runtime_file("", true),
+                library = libraries
             },
             telemetry = {
                 enable = false,

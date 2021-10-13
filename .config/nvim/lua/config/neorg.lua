@@ -17,9 +17,9 @@ require('neorg').setup {
             }
         },
         ["core.ui"] = {},
---        ["core.gtd.base"] = {
---                  config = { workspace = "gtd" }
---        },
+        ["core.gtd.base"] = {
+                  config = { workspace = "gtd" }
+        },
         ["core.norg.completion"] = {
 	        config = {
 		        engine = "nvim-cmp" -- We current support nvim-compe and nvim-cmp only
