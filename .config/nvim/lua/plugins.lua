@@ -5,13 +5,13 @@ return require('packer').startup(function(use)
     use 'andweeb/presence.nvim'
 --  use '~/Documents/tex-nvim'
     use { 'kdheepak/tabline.nvim',
-        requires = { { 'shadmansaleh/lualine.nvim', opt = true }, {'kyazdani42/nvim-web-devicons'} }
+        requires = { { 'nvim-lualine/lualine.nvim', opt = true }, {'kyazdani42/nvim-web-devicons'} }
     }
 	use { 'nvim-telescope/telescope.nvim',
 		requires = {{'nvim-lua/popup.nvim'}, {'nvim-lua/plenary.nvim'}}
 	}
     use {'nvim-treesitter/nvim-treesitter', run = ':TSUpdate'}
-    use { 'shadmansaleh/lualine.nvim',
+    use { 'nvim-lualine/lualine.nvim',
         requires = {'kyazdani42/nvim-web-devicons', opt = true}
     }
     use { "nvim-neorg/neorg",
