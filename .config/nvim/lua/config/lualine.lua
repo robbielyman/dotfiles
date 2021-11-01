@@ -8,11 +8,11 @@ local function wttr()
     return s
 end
 
-local weather = wttr()
+local weather = nil
 local minutes = tonumber(os.date("%M"))
 local function wttr_comp()
     local checkminutes = tonumber(os.date("%M"))
-    if (60 + checkminutes - minutes) % 60 >= 5 then
+    if (60 + checkminutes - minutes) % 60 >= 1 then
         minutes = checkminutes
         weather = wttr()
     end
@@ -23,6 +23,6 @@ require('lualine').setup{
     options = {
         theme = 'nord'
     },
-    sections = { lualine_x = {'encoding', wttr_comp, 'filetype'}, },
+    sections = { lualine_x = {'encoding', 'fileformat', 'filetype'}, },
     extensions = { 'quickfix' }
 }

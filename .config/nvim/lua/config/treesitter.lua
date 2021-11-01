@@ -9,7 +9,7 @@ parser_configs.norg = {
 }
 
 require('nvim-treesitter.configs').setup {
-    ensure_installed = {"norg", "lua", "html", "vim", "latex", "cpp", "bibtex"},
+    ensure_installed = {"norg", "lua", "html", "vim", "latex", "cpp", "bibtex", "supercollider"},
     highlight = {
         enable = true,
         -- disable = { "latex" },
