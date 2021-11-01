@@ -1,5 +1,4 @@
 vim.g.maplocallleader = '\\'
-vim.g.python3_host_prog = '/Users/rylee/.pyenv/versions/3.9.0/bin/python'
 
 require('settings')
 
