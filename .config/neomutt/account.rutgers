@@ -1,0 +1,15 @@
+# nvim ~/.mutt/account.rutgers
+
+# My Mailboxes --------------------------------------------------------------------------
+set folder = "~/.mail/rutgers/"
+set spoolfile = "+INBOX"
+unmailboxes *
+mailboxes +INBOX +Archive +Drafts +Sent\ Items
+set mbox = "+Archive"
+set postponed = "+Drafts"
+mailboxes "~/.cache/mutt_results"
+
+unset from
+unset sendmail
+set from = "rylee.lyman@rutgers.edu"
+set sendmail = "/usr/bin/msmtp -a academic"
