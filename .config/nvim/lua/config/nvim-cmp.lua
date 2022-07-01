@@ -1,11 +1,12 @@
 local cmp = require('cmp')
 
 require('cmp').setup {
-    snippet = {
-        expand = function(args)
-            require('luasnip').lsp_expand(args.body)
-        end
-    },
+  snippet = {
+    expand = function(args)
+      require 'snippy'.expand_snippet(args.body)
+    end
+  },
+
     mapping = {
         ['<C-p>'] = cmp.mapping.select_prev_item(),
         ['<C-n>'] = cmp.mapping.select_next_item(),
@@ -26,7 +27,7 @@ require('cmp').setup {
         -- end),
     },
     sources = {
-        { name = 'luasnip' },
+        { name = 'snippy' },
         { name = 'nvim_lsp' },
         { name = 'buffer' },
         { name = 'path' },

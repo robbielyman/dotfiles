@@ -12,13 +12,12 @@ require('neorg').setup {
             config = {
                 workspaces = {
                     main = "~/neorg",
-                    gtd = "~/gtd"
                 }
             }
         },
         ["core.ui"] = {},
         ["core.gtd.base"] = {
-                  config = { workspace = "gtd" }
+                  config = { workspace = "main" }
         },
         ["core.norg.completion"] = {
 	        config = {
