@@ -35,8 +35,9 @@ capabilities.textDocument.completion.completionItem.resolveSupport = {
 }
 
 local uname = vim.loop.os_uname().sysname
-local sumneko_root_path = uname == "Linux" and '/home/rylee/src/lua-language-server' or '/Users/rylee/.local/share/nvim/lua-language-server'
-local sumneko_binary = uname == "Linux" and sumneko_root_path.."/bin/Linux/lua-language-server" or sumneko_root_path.."/bin/macOS/lua-language-server"
+local sumneko_root_path = uname == "Linux" and '/home/rylee/src/lua-language-server' or '/opt/homebrew/Cellar/lua-language-server'
+local sumneko_binary = uname == "Linux" and sumneko_root_path.."/bin/Linux/lua-language-server" 
+        or "/opt/homebrew/bin/lua-language-server"
 
 local runtime_path = vim.split(package.path, ';')
 table.insert(runtime_path, "lua/?.lua")
@@ -46,7 +47,7 @@ local libraries = vim.api.nvim_get_runtime_file("", true)
 table.insert(libraries, uname == "Linux" and "/home/rylee/src/norns/lua" or "/Users/rylee/src/norns/lua")
 
 require("lspconfig").sumneko_lua.setup {
-    cmd = {sumneko_binary, "-E", sumneko_root_path .. "/main.lua"},
+    cmd = uname == "Linux" and {sumneko_binary, "-E", sumneko_root_path .. "/main.lua"},
     settings = {
         Lua = {
             runtime = {
