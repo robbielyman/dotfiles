@@ -1,19 +1,18 @@
 return require('packer').startup(function(use)
 	use 'wbthomason/packer.nvim'
 	use 'arcticicestudio/nord-vim'
-	-- use 'lervag/vimtex'
+	use 'lervag/vimtex'
   use 'andweeb/presence.nvim'
-  -- use 'f3fora/nvim-texlabconfig'
   use '~/src/latex.nvim'
   use { 'kdheepak/tabline.nvim',
-      requires = { { 'nvim-lualine/lualine.nvim', opt = true }, {'kyazdani42/nvim-web-devicons'} }
+    requires = { { 'nvim-lualine/lualine.nvim', opt = true }, {'kyazdani42/nvim-web-devicons'} }
   }
 	use { 'nvim-telescope/telescope.nvim',
 		requires = {{'nvim-lua/popup.nvim'}, {'nvim-lua/plenary.nvim'}}
 	}
   use {'nvim-treesitter/nvim-treesitter', run = ':TSUpdate'}
   use { 'nvim-lualine/lualine.nvim',
-      requires = {'kyazdani42/nvim-web-devicons', opt = true}
+    requires = {'kyazdani42/nvim-web-devicons', opt = true}
   }
   use 'luukvbaal/nnn.nvim'
   use 'hrsh7th/nvim-cmp'
@@ -29,4 +28,10 @@ return require('packer').startup(function(use)
   use 'tpope/vim-surround'
   use 'tpope/vim-liquid'
   use 'ludovicchabant/vim-gutentags'
+  use {
+      'lewis6991/gitsigns.nvim',
+      config = function()
+          require('gitsigns').setup()
+      end
+  }
 end)
