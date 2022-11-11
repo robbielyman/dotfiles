@@ -14,6 +14,7 @@ vim.cmd 'autocmd TermOpen * setlocal listchars= nonumber norelativenumber'
 vim.cmd 'autocmd TermOpen * startinsert'
 vim.o.foldmethod = 'expr'
 vim.o.foldexpr = 'nvim_treesitter#foldexpr()'
+vim.cmd 'set nofoldenable'
 
 require('plugins')
 
