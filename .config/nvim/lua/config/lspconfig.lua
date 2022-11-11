@@ -76,9 +76,12 @@ require("lspconfig").texlab.setup {
         onEdit = true,
         onOpenAndSave = true,
       },
-      forwardSearch = {
+      forwardSearch = uname == "Linux" and {
+        executable = "zathura",
+        args = {"--synctex-forward", "%l:1:%f", "%p"},
+      } or {
         executable = "/Applications/Skim.app/Contents/SharedSupport/displayline",
-        args = {"%l", '%p', '%f'}
+        args = {"%l", "%p", "%f"}
       },
       build = {
         onSave = true,
