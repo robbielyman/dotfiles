@@ -9,7 +9,7 @@ return require('packer').startup(function(use)
   use 'andweeb/presence.nvim'
 
   -- latex
-  use '~/src/latex.nvim'
+  use 'ryleelyman/latex.nvim'
 
   -- tabline / status line
   use { 'kdheepak/tabline.nvim',

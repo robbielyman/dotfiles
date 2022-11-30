@@ -1,9 +1,9 @@
 local parser_config = require "nvim-treesitter.parsers".get_parser_configs()
 parser_config.markdown = {
   install_info = {
-    url = "/Users/rylee/src/tree-sitter-markdown/tree-sitter-markdown", -- local path or git repo
+    url = "ryleelyman/tree-sitter-markdown", -- local path or git repo
     files = {"src/parser.c", "src/scanner.cc"},
-    -- location = "tree-sitter-markdown",
+    location = "tree-sitter-markdown",
     -- optional entries:
     branch = "split_parser", -- default branch in case of git repo if different from master
     generate_requires_npm = false, -- if stand-alone parser without npm dependencies
@@ -12,9 +12,9 @@ parser_config.markdown = {
 }
 parser_config.markdown_inline = {
   install_info = {
-    url = "/Users/rylee/src/tree-sitter-markdown/tree-sitter-markdown-inline", -- local path or git repo
+    url = "ryleelyman/tree-sitter-markdown", -- local path or git repo
     files = {"src/parser.c", "src/scanner.cc"},
-    -- location = "tree-sitter-markdown-inline",
+    location = "tree-sitter-markdown-inline",
     -- optional entries:
     branch = "split_parser", -- default branch in case of git repo if different from master
     generate_requires_npm = false, -- if stand-alone parser without npm dependencies
@@ -23,7 +23,7 @@ parser_config.markdown_inline = {
 }
 parser_config.latex = {
   install_info = {
-    url = "/Users/rylee/src/tree-sitter-latex",
+    url = "ryleelyman/tree-sitter-latex",
     files = {"src/parser.c", "src/scanner.c"},
     generate_requires_npm = false,
     requires_generate_from_grammar = false
