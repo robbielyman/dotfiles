@@ -3,7 +3,9 @@ return require('packer').startup(function(use)
   use 'wbthomason/packer.nvim'
 
   -- colors
-  use 'sam4llis/nvim-tundra'
+  use {'sam4llis/nvim-tundra',
+    branch = 'dev'
+  }
 
   -- discord
   use 'andweeb/presence.nvim'
