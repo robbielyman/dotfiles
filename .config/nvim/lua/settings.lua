@@ -15,5 +15,3 @@ utils.opt('w', 'number', true)
 utils.opt('w', 'relativenumber', true)
 utils.opt('o', 'showmode', false)
 utils.opt('w', 'conceallevel', 2)
-cmd 'nnoremap <leader>. :lcd %:p:h<CR>'
-cmd 'hi Conceal guibg = none'

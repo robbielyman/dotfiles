@@ -21,7 +21,7 @@ end
 
 require('lualine').setup{
     options = {
-        theme = 'nord'
+        theme = 'tundra'
     },
     sections = { lualine_x = {'encoding', 'fileformat', 'filetype'}, },
     extensions = { 'quickfix' }
