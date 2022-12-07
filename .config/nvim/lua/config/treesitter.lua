@@ -23,16 +23,16 @@ parser_config.markdown_inline = {
     revision = '49fc3e40a88b2d15a693e86568fc6cff6a274762'
   },
 }
-parser_config.latex = {
-  install_info = {
-    url = "https://github.com/ryleelyman/tree-sitter-latex",
-    files = {"src/parser.c", "src/scanner.c"},
-    generate_requires_npm = false,
-    requires_generate_from_grammar = false,
-    revision = '4e1c009f58f4e285ec4b8dfbaece3453bacc756a'
-  },
-  filetype = 'tex'
-}
+-- parser_config.latex = {
+--   install_info = {
+--     url = "https://github.com/ryleelyman/tree-sitter-latex",
+--     files = {"src/parser.c", "src/scanner.c"},
+--     generate_requires_npm = false,
+--     requires_generate_from_grammar = false,
+--     revision = '4e1c009f58f4e285ec4b8dfbaece3453bacc756a'
+--   },
+--   filetype = 'tex'
+-- }
 
 require('treesitter-context').setup {
   patterns = {

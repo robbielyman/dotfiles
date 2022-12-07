@@ -4,5 +4,10 @@ require('latex').setup{
       ["\\colon"] = ":",
       ["\\tilde"] = "~",
     }
+  },
+  conceals = {
+    add = {
+      ["colon"] = ":"
+    }
   }
 }

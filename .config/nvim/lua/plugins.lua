@@ -11,7 +11,7 @@ return require('packer').startup(function(use)
   use 'andweeb/presence.nvim'
 
   -- latex
-  use 'ryleelyman/latex.nvim'
+  use '~/src/latex.nvim'
 
   -- tabline / status line
   use { 'kdheepak/tabline.nvim',
@@ -53,11 +53,17 @@ return require('packer').startup(function(use)
   -- snippets
   use 'dcampos/nvim-snippy'
 
-  -- gitsigns
+  -- git
   use {
     'lewis6991/gitsigns.nvim',
     config = function()
       require('gitsigns').setup()
+    end
+  }
+  use { 'sindrets/diffview.nvim',
+    requires = 'nvim-lua/plenary.nvim',
+    config = function()
+      require('diffview').setup()
     end
   }
 

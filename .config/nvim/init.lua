@@ -15,6 +15,7 @@ vim.cmd 'autocmd TermOpen * startinsert'
 vim.o.foldmethod = 'expr'
 vim.o.foldexpr = 'nvim_treesitter#foldexpr()'
 vim.cmd 'set nofoldenable'
+vim.cmd 'set termguicolors'
 
 require('plugins')
 
