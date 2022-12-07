@@ -69,7 +69,7 @@ return require('packer').startup(function(use)
 
   -- autopairs
   use 'windwp/nvim-autopairs'
-  use { 'kylechui/nvim-surround',
+  use { 'ryleelyman/nvim-surround',
     config = function()
       require('nvim-surround').setup{}
     end

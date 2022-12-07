@@ -9,5 +9,10 @@ require('latex').setup{
     add = {
       ["colon"] = ":"
     }
+  },
+  surrounds = {
+    enabled  = true,
+    command = "c",
+    environment = "E"
   }
 }
