@@ -13,6 +13,6 @@ require('latex').setup{
   surrounds = {
     enabled  = true,
     command = "c",
-    environment = "E"
+    environment = "e"
   }
 }

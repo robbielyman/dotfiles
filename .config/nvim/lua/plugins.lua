@@ -70,6 +70,7 @@ return require('packer').startup(function(use)
   -- autopairs
   use 'windwp/nvim-autopairs'
   use { 'ryleelyman/nvim-surround',
+    branch = "patch-1",
     config = function()
       require('nvim-surround').setup{}
     end
