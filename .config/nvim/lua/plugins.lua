@@ -69,12 +69,18 @@ return require('packer').startup(function(use)
 
   -- autopairs
   use 'windwp/nvim-autopairs'
-  use { 'ryleelyman/nvim-surround',
-    branch = "patch-1",
+  use { 'kylechui/nvim-surround',
     config = function()
       require('nvim-surround').setup{}
     end
   }
   -- use 'tpope/vim-surround'
   -- use 'ludovicchabant/vim-gutentags'
+
+  -- leap
+  use { 'ggandor/leap.nvim',
+    config = function()
+      require('leap').add_default_mappings()
+    end
+  }
 end)
