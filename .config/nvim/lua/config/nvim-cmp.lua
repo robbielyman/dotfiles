@@ -5,7 +5,7 @@ lspkind.init()
 require('cmp').setup {
   snippet = {
     expand = function(args)
-      require 'snippy'.expand_snippet(args.body)
+      require 'luasnip'.lsp_expand(args.body)
     end
   },
   formatting = {
@@ -19,7 +19,7 @@ require('cmp').setup {
   mapping = cmp.mapping.preset.insert(),
   sources = {
     { name = 'nvim_lsp' },
-    { name = 'snippy' },
+    { name = 'luasnip' },
     { name = 'nvim_lua' },
     { name = 'buffer' , keyword_length = 5 },
     { name = 'nvim_lsp_signature_help' },

@@ -44,14 +44,14 @@ return require('packer').startup(function(use)
   use 'hrsh7th/cmp-nvim-lua'
   use 'hrsh7th/cmp-nvim-lsp'
   use 'hrsh7th/cmp-path'
-  use 'dcampos/cmp-snippy'
+  use 'saadparwaiz1/cmp_luasnip'
   use 'hrsh7th/cmp-cmdline'
   use 'hrsh7th/cmp-nvim-lsp-signature-help'
   use 'ray-x/cmp-treesitter'
   use 'onsails/lspkind.nvim'
 
   -- snippets
-  use 'dcampos/nvim-snippy'
+  use 'L3MON4D3/LuaSnip'
 
   -- git
   use {
