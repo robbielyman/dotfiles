@@ -13,6 +13,9 @@ return require('packer').startup(function(use)
   -- latex
   use '~/src/latex.nvim'
 
+  -- tidal
+  use '~/src/tidal.nvim'
+
   -- tabline / status line
   use { 'kdheepak/tabline.nvim',
     requires = { { 'nvim-lualine/lualine.nvim', opt = true }, {'kyazdani42/nvim-web-devicons'} }
