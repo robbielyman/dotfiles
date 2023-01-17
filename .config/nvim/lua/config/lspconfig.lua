@@ -40,11 +40,9 @@ local runtime_path = vim.split(package.path, ';')
 table.insert(runtime_path, "lua/?.lua")
 table.insert(runtime_path, "lua/?/init.lua")
 
-local libraries = {
-  vim.api.nvim_get_runtime_file("", true),
-  "${3rd}/busted/library",
-  "${3rd}/luassert/library",
-}
+local libraries = vim.api.nvim_get_runtime_file("lua", true)
+table.insert(libraries, "${3rd}/busted/library")
+table.insert(libraries, "{$3rd}/luassert/library")
 table.insert(libraries, uname == "Linux" and "/home/rylee/src/norns/lua" or "/Users/rylee/src/norns/lua")
 
 require("lspconfig").sumneko_lua.setup {
@@ -53,7 +51,6 @@ require("lspconfig").sumneko_lua.setup {
     Lua = {
       runtime = {
         version = 'LuaJIT',
-        path = runtime_path,
       },
       diagnostics = {
         globals = {'vim'},
@@ -99,3 +96,9 @@ require("lspconfig").clangd.setup {
   on_attach = on_attach,
 }
 
+require("lspconfig").hls.setup {
+  capabilities = capabilities,
+  on_attach = on_attach,
+  filetypes = { "haskell", "lhaskell", "tidal" },
+  cmd = { "haskell-language-server-wrapper", "--lsp" }
+}

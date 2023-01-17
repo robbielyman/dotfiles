@@ -11,7 +11,7 @@ local function wttr_comp()
   last = os.time()
   job = Job:new{
     command = 'curl',
-    args = { "wttr.in/?format=%l:\\n+%c%t\\n" },
+    args = { "wttr.in/?format=%l:\\n+%c%f\\n" },
     cwd = '/usr/bin',
     env = {},
     on_exit = function(j, ret)
