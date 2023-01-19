@@ -29,6 +29,14 @@ return require('packer').startup(function(use)
     requires = {{'nvim-lua/popup.nvim'}, {'nvim-lua/plenary.nvim'}}
   }
 
+  -- trouble
+  use {
+    "folke/trouble.nvim",
+    requires = "kyazdani42/nvim-web-devicons",
+    config = function()
+      require("trouble").setup{}
+    end
+  }
   -- tree-sitter
   use 'nvim-treesitter/playground'
   use {'nvim-treesitter/nvim-treesitter', run = ':TSUpdate'}
