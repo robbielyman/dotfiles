@@ -42,10 +42,30 @@ local runtime_path = vim.split(package.path, ';')
 table.insert(runtime_path, "lua/?.lua")
 table.insert(runtime_path, "lua/?/init.lua")
 
-local libraries = vim.api.nvim_get_runtime_file("lua", true)
-table.insert(libraries, "${3rd}/busted/library")
-table.insert(libraries, "{$3rd}/luassert/library")
+local libraries = {"${3rd}/busted/library", "{$3rd}/luassert/library", unpack(vim.api.nvim_get_runtime_file("lua", true))}
 table.insert(libraries, uname == "Linux" and "/home/rylee/src/norns/lua" or "/Users/rylee/src/norns/lua")
+
+require("lspconfig.configs").supercollider = {
+  default_config = {
+    cmd = {'/Users/rylee/src/sclang-lsp-stdio/sclang-lsp-stdio.mjs', '/usr/local/bin/sclang', '-d', '/tmp/log.txt'},
+    filetypes = {'supercollider'},
+    root_dir = require('lspconfig.util').find_git_ancestor,
+    single_file_support = true,
+  },
+  settings = {},
+  docs = {
+    package_json = '',
+    description = [[]],
+    default_config = {
+      root_dir = [[]],
+    },
+  },
+}
+
+require("lspconfig").supercollider.setup{
+  capabilities = capabilities,
+  on_attach = on_attach
+}
 
 require("lspconfig").sumneko_lua.setup {
   settings = {
@@ -75,6 +95,7 @@ require("lspconfig").texlab.setup {
         onEdit = true,
         onOpenAndSave = true,
       },
+      rootDirectory = ".",
       forwardSearch = uname == "Linux" and {
         executable = "zathura",
         args = {"--synctex-forward", "%l:1:%f", "%p"},
