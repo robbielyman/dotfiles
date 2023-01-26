@@ -1,4 +1,5 @@
 local path = arg[1]
+path  = string.gsub(path, '/%./', '/')
 local _, _, folder = string.find(path, "/(%w+)/(%w+).tex")
 if not folder then return end
 local file = io.popen("kitty @ --to unix:/tmp/kitty-$KITTY_PID ls")
