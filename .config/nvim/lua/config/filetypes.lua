@@ -24,3 +24,10 @@ require('tidal').setup{
     }
   }
 }
+
+require('supercollider').setup{
+  boot = {
+    enabled = true,
+    split = 'v'
+  },
+}

@@ -47,7 +47,11 @@ table.insert(libraries, uname == "Linux" and "/home/rylee/src/norns/lua" or "/Us
 
 require("lspconfig.configs").supercollider = {
   default_config = {
-    cmd = {'/Users/rylee/src/sclang-lsp-stdio/sclang-lsp-stdio.mjs', '/usr/local/bin/sclang', '-d', '/tmp/log.txt'},
+    cmd = {'/Users/rylee/src/sclang-lsp-stdio/sclang-lsp-stdio.mjs',
+      '/Users/rylee/src/supercollider/build/Install/SuperCollider/SuperCollider.app/Contents/MacOS/sclang',
+      '-d',
+      '/tmp/log.txt'
+    },
     filetypes = {'supercollider'},
     root_dir = require('lspconfig.util').find_git_ancestor,
     single_file_support = true,
@@ -77,7 +81,8 @@ require("lspconfig").sumneko_lua.setup {
         globals = {'vim'},
       },
       workspace = {
-        library = libraries
+        library = libraries,
+        checkThirdParty = false
       },
       telemetry = {
         enable = false,
