@@ -50,7 +50,7 @@ require("lspconfig.configs").supercollider = {
     cmd = {'/Users/rylee/src/sclang-lsp-stdio/sclang-lsp-stdio.mjs',
       '/Users/rylee/src/supercollider/build/Install/SuperCollider/SuperCollider.app/Contents/MacOS/sclang',
       '-d',
-      '/tmp/log.txt'
+      '/tmp/log.txt',
     },
     filetypes = {'supercollider'},
     root_dir = require('lspconfig.util').find_git_ancestor,

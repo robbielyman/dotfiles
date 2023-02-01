@@ -8,7 +8,7 @@ parser_config.markdown = {
     branch = "split_parser", -- default branch in case of git repo if different from master
     generate_requires_npm = false, -- if stand-alone parser without npm dependencies
     requires_generate_from_grammar = false, -- if folder contains pre-generated src/parser.c
-    revision = '49fc3e40a88b2d15a693e86568fc6cff6a274762'
+    revision = 'f7160b1751deb17854aabbaa4d1bf70a3a55e295'
   },
 }
 parser_config.markdown_inline = {
@@ -20,7 +20,7 @@ parser_config.markdown_inline = {
     branch = "split_parser", -- default branch in case of git repo if different from master
     generate_requires_npm = false, -- if stand-alone parser without npm dependencies
     requires_generate_from_grammar = false, -- if folder contains pre-generated src/parser.c
-    revision = '49fc3e40a88b2d15a693e86568fc6cff6a274762'
+    revision = 'f7160b1751deb17854aabbaa4d1bf70a3a55e295'
   },
 }
 -- parser_config.latex = {
