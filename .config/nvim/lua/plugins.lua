@@ -10,8 +10,18 @@ return require('packer').startup(function(use)
   -- discord
   use 'andweeb/presence.nvim'
 
+  -- alpha-nvim
+  use {
+    'goolord/alpha-nvim',
+    config = function ()
+      require'alpha'.setup(require'alpha.themes.dashboard'.config)
+    end
+  }
+
   -- latex
-  use '~/src/latex.nvim'
+  use {'~/src/latex.nvim',
+    requires = {{'nvim-lua/plenary.nvim'}}
+  }
 
   -- tidal
   use '~/src/tidal.nvim'

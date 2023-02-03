@@ -21,7 +21,7 @@ local function wttr_comp()
       weather = tbl
       if string.find(weather[1], "Brooklyn") then
         weather = "bklyn:" .. weather[2]
-      elseif string.find(weather[1], "Newark") then
+      elseif string.find(weather[1], "North Brunswick") then
         weather = "nwrk:" .. weather[2]
       else
         weather = weather[2]
