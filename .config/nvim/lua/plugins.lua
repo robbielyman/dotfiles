@@ -3,18 +3,27 @@ return require('packer').startup(function(use)
   use 'wbthomason/packer.nvim'
 
   -- colors
-  use {'sam4llis/nvim-tundra',
-    branch = 'dev'
-  }
+  use { "catppuccin/nvim", as = "catppuccin" }
 
   -- discord
   use 'andweeb/presence.nvim'
 
   -- alpha-nvim
   use {
-    'goolord/alpha-nvim',
+    'Shatur/neovim-session-manager',
+    requires = { 'nvim-lua/plenary.nvim' },
     config = function ()
-      require'alpha'.setup(require'alpha.themes.dashboard'.config)
+      require('session_manager').setup{
+        autoload_mode = require'session_manager.config'.AutoloadMode.Disabled,
+        autosave_last_session = false,
+      }
+    end
+  }
+  use {
+    'goolord/alpha-nvim',
+    requires = { 'nvim-tree/nvim-web-devicons' },
+    config = function ()
+      require'alpha'.setup(require'alpha.themes.startify'.config)
     end
   }
 
@@ -31,10 +40,10 @@ return require('packer').startup(function(use)
 
   -- tabline / status line
   use { 'kdheepak/tabline.nvim',
-    requires = { { 'nvim-lualine/lualine.nvim', opt = true }, {'kyazdani42/nvim-web-devicons'} }
+    requires = { { 'nvim-lualine/lualine.nvim', opt = true }, {'nvim-tree/nvim-web-devicons'} }
   }
   use { 'nvim-lualine/lualine.nvim',
-    requires = {'kyazdani42/nvim-web-devicons', opt = true}
+    requires = {'nvim-tree/nvim-web-devicons', opt = true}
   }
 
   -- telescope
@@ -45,7 +54,7 @@ return require('packer').startup(function(use)
   -- trouble
   use {
     "folke/trouble.nvim",
-    requires = "kyazdani42/nvim-web-devicons",
+    requires = "nvim-tree/nvim-web-devicons",
     config = function()
       require("trouble").setup{}
     end

@@ -33,7 +33,7 @@ end
 
 require('lualine').setup{
   options = {
-    theme = 'tundra'
+    theme = 'catppuccin'
   },
   sections = { lualine_x = {'encoding', wttr_comp, 'filetype'}, },
   extensions = { 'quickfix' }

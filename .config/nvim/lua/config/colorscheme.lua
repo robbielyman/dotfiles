@@ -1,39 +1,37 @@
-require('nvim-tundra').setup{
+require("catppuccin").setup{
+  flavor = "frappe",
   transparent_background = true,
-  dim_inactive_windows = {
-    enabled = true,
+  term_colors = true,
+  styles = {
+    booleans = { "bold" },
   },
-  plugins = {
-    telescope = true,
+  integrations = {
     cmp = true,
     gitsigns = true,
+    telescope = true,
+    leap = true,
+    markdown = true,
+    native_lsp = {
+      enabled = true,
+      virtual_text = {
+        errors = { "italic" },
+        hints = {},
+        warnings = { "italic" },
+        information = {},
+      },
+      underlines = {
+        errors = { "underline" },
+        hints = {},
+        warnings = { "underline" },
+        information ={},
+      },
+    },
+    treesitter = true,
+    treesitter_context = true,
+    lsp_trouble = true,
   },
-  syntax = {
-    booleans = { bold = true, italic = true },
-    comments = { bold = true, italic = true },
-    conditionals = {},
-    constants = { bold = true },
-    fields = {},
-    functions = {},
-    keywords = {},
-    loops = {},
-    numbers = { bold = true },
-    operators = { bold = true },
-    punctuation = {},
-    strings = {},
-    types = { italic = true },
-  },
-  overwrite = {
-    highlights = {
-      ["@text.emphasis"] = { italic = true },
-      ["@text.strong"] = { bold = true },
-      ["@text.title"] = { bold = true },
-    }
-  }
+  compile_path = vim.fn.stdpath "cache" .. "/catppuccin"
 }
 
-vim.opt.background = 'dark'
-vim.cmd('colorscheme tundra')
-
-vim.cmd "let g:tex_conceal='abdmgs'"
 vim.cmd 'hi Conceal guibg = none'
+vim.cmd.colorscheme "catppuccin"

@@ -1,37 +1,12 @@
-local parser_config = require "nvim-treesitter.parsers".get_parser_configs() parser_config.markdown = {
+local parser_config = require "nvim-treesitter.parsers".get_parser_configs()
+
+parser_config.io = {
   install_info = {
-    url = "https://github.com/ryleelyman/tree-sitter-markdown", -- local path or git repo
-    files = {"src/parser.c", "src/scanner.cc"},
-    location = "tree-sitter-markdown",
-    -- optional entries:
-    branch = "split_parser", -- default branch in case of git repo if different from master
-    generate_requires_npm = false, -- if stand-alone parser without npm dependencies
-    requires_generate_from_grammar = false, -- if folder contains pre-generated src/parser.c
-    revision = '7acd0c5fea54e6adddd3984cb51de1d1ac71e764'
-  },
+    url = "https://github.com/ryleelyman/tree-sitter-io",
+    files = {"src/parser.c"},
+    branch = "main"
+  }
 }
-parser_config.markdown_inline = {
-  install_info = {
-    url = "https://github.com/ryleelyman/tree-sitter-markdown", -- local path or git repo
-    files = {"src/parser.c", "src/scanner.cc"},
-    location = "tree-sitter-markdown-inline",
-    -- optional entries:
-    branch = "split_parser", -- default branch in case of git repo if different from master
-    generate_requires_npm = false, -- if stand-alone parser without npm dependencies
-    requires_generate_from_grammar = false, -- if folder contains pre-generated src/parser.c
-    revision = '7acd0c5fea54e6adddd3984cb51de1d1ac71e764'
-  },
-}
--- parser_config.latex = {
---   install_info = {
---     url = "https://github.com/ryleelyman/tree-sitter-latex",
---     files = {"src/parser.c", "src/scanner.c"},
---     generate_requires_npm = false,
---     requires_generate_from_grammar = false,
---     revision = '4e1c009f58f4e285ec4b8dfbaece3453bacc756a'
---   },
---   filetype = 'tex'
--- }
 
 require('treesitter-context').setup {
   patterns = {
@@ -58,7 +33,10 @@ require('nvim-treesitter.configs').setup {
     "javascript",
     "markdown",
     "markdown_inline",
-    "help"
+    "io",
+    "help",
+    "regex",
+    "comment"
   },
   highlight = {
     enable = true,
