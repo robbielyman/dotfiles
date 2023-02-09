@@ -21,17 +21,28 @@ require("catppuccin").setup{
       },
       underlines = {
         errors = { "underline" },
-        hints = {},
+        hints = { "underline" },
         warnings = { "underline" },
-        information ={},
+        information ={ "underline" },
       },
     },
     treesitter = true,
     treesitter_context = true,
     lsp_trouble = true,
   },
-  compile_path = vim.fn.stdpath "cache" .. "/catppuccin"
+  compile_path = vim.fn.stdpath "cache" .. "/catppuccin",
+  highlight_overrides = {
+    frappe = function(frappe)
+      return {
+        Comment = { fg = frappe.flamingo },
+        ["@comment"] = { fg = frappe.flamingo, style = { "italic" }},
+        ["@constant"] = { fg = frappe.pink, style = { "bold" }},
+        Constant = { fg = frappe.pink, style = { "bold" }},
+        ["@variable"] = { fg = nil },
+      }
+    end
+  }
 }
 
 vim.cmd 'hi Conceal guibg = none'
-vim.cmd.colorscheme "catppuccin"
+vim.cmd.colorscheme "catppuccin-frappe"

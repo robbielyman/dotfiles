@@ -2,7 +2,7 @@ local parser_config = require "nvim-treesitter.parsers".get_parser_configs()
 
 parser_config.io = {
   install_info = {
-    url = "https://github.com/ryleelyman/tree-sitter-io",
+    url = "/Users/rylee/src/tree-sitter-io",
     files = {"src/parser.c"},
     branch = "main"
   }
