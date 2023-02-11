@@ -1,22 +1,63 @@
-vim.g.maplocallleader = '\\'
+vim.g.mapleader = ' '
 
-require('settings')
-
-local fn = vim.fn
-local install_path = fn.stdpath('data')..'/site/pack/packer/start/packer.nvim'
-if fn.empty(fn.glob(install_path)) > 0 then
-  fn.system({'git', 'clone', '--depth', '1', 'https://github.com/wbthomason/packer.nvim', install_path})
-  vim.cmd 'packadd packer.nvim'
+function P(table)
+  print(vim.inspect(table))
+  return table
 end
 
-vim.cmd 'autocmd BufWritePost plugins.lua PackerCompile'
-vim.cmd 'autocmd TermOpen * setlocal listchars= nonumber norelativenumber'
-vim.cmd 'autocmd TermOpen * startinsert'
-vim.o.foldmethod = 'expr'
-vim.o.foldexpr = 'nvim_treesitter#foldexpr()'
-vim.cmd 'set nofoldenable'
-vim.cmd 'set termguicolors'
+function RELOAD(...)
+  return require("plenary.reload").reload_module(...)
+end
 
-require('plugins')
+function R(name)
+  RELOAD(name)
+  return require(name)
+end
 
-require('config')
+vim.cmd 'syntax enable'
+vim.cmd 'filetype plugin indent on'
+
+local function set_opts(args)
+  for key, value in pairs(args) do
+    if type(value) ~= 'table' then
+      value = { value }
+    end
+    vim.o[key] = value[1]
+    if value.scope then
+      vim[value.scope][key] = value[1]
+    end
+  end
+end
+
+set_opts {
+  expandtab = { true, scope = 'bo'},
+  shiftwidth = { 2, scope = 'bo'},
+  tabstop = { 2, scope = 'bo'},
+  number = { true, scope = 'wo'},
+  relativenumber = { true, scope = 'wo'},
+  showmode = false,
+  conceallevel = { 2, scope = 'wo'},
+  foldmethod = 'expr',
+  foldexpr = 'nvim_treesitter#foldexpr()',
+  termguicolors = true,
+  foldenable = false,
+}
+
+local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
+if not vim.loop.fs_stat(lazypath) then
+  vim.fn.system({
+    "git",
+    "clone",
+    "--filter=blob:none",
+    "https://github.com/folke/lazy.nvim.git",
+    "--branch=stable", -- latest stable release
+    lazypath,
+  })
+end
+vim.opt.rtp:prepend(lazypath)
+
+vim.api.nvim_create_autocmd("TermOpen", {
+  command = "setlocal listchars= nonumber norelativenumber"
+})
+
+require('lazy').setup("plugins")
