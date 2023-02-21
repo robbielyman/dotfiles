@@ -17,11 +17,6 @@ return {
           ["colon"] = ":"
         },
       },
-      surrounds = {
-        enabled = true,
-        command = "c",
-        environment = "e",
-      }
     }
   },
   {

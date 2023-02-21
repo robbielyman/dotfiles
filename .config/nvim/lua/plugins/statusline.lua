@@ -29,17 +29,30 @@ local function wttr_comp()
   return weather
 end
 
+local function diff_source()
+  local gitsigns = vim.b.gitsigns_status_dict
+  if gitsigns then
+    return {
+      added = gitsigns.added,
+      modified = gitsigns.changed,
+      removed = gitsigns.removed
+    }
+  end
+end
+
 return {
   {
     'nvim-lualine/lualine.nvim',
     lazy = true,
     event = 'VeryLazy',
-    dependencies = { 'nvim-tree/nvim-web-devicons', 'nvim-lua/plenary.nvim' },
+    dependencies = { 'nvim-tree/nvim-web-devicons', 'nvim-lua/plenary.nvim', 'gitsigns.nvim' },
     opts = {
       options = {
         theme = 'catppuccin',
       },
-      sections = { lualine_x = {'encoding', wttr_comp, 'filetype'}, },
+      sections = {
+        lualine_b = { {'diff', diff_source }, },
+        lualine_x = {'encoding', wttr_comp, 'filetype'}, },
       extensions = { 'quickfix' }
     }
   },
@@ -48,5 +61,6 @@ return {
     lazy = true,
     event = 'VeryLazy',
     dependencies = { 'nvim-tree/nvim-web-devicons' },
+    config = true
   }
 }

@@ -51,7 +51,7 @@ return {
   -- NNN
   {
     'luukvbaal/nnn.nvim',
-    lazy = true,
+    lazy = false,
     cmd = {"NnnExplorer", "NnnPicker"},
     opts = {
       replace_netrw = 'explorer'

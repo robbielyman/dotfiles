@@ -13,13 +13,19 @@ return {
       delete_check_events = 'TextChanged',
     },
     keys = {
-      {'<C-K>', '<Plug>luasnip-expand-or-jump',
-        remap = true, expr = true, silent = true, mode = 'i', remap = true },
-      {'<C-E>', '<Plug>luasnip-next-choice', mode = 'i' },
+      {'<C-K>', nil, mode = 'i' },
+      {'<C-E>', '<cmd>lua require("luasnip").change_choice(1)', mode = 'i' },
       {'<C-F>', '<cmd>lua require("luasnip.extras.otf").on_the_fly("e")<CR>', mode = 'i' },
       {'<C-F>', '"ec<cmd>lua require("luasnip.extras.otf").on_the_fly("e")<CR>', mode = 'v'}
     },
     lazy = true,
+    config = function(_, opts)
+      vim.keymap.set('i', '<C-K>', function() require('luasnip').expand_or_jump() end, {silent = true, desc = "LuaSnip jump or expand"})
+      vim.keymap.set('i', '<C-E>', function() require('luasnip').change_choice(1) end, {silent = true, desc = "LuaSnip change choice"})
+      vim.keymap.set('i', '<C-F>', function() require('luasnip.extras.otf').on_the_fly('e') end, {silent = true, desc = "LuaSnip on the fly"})
+      vim.keymap.set('v', '<C-F>', '"ec<cmd>lua require("luasnip.expras.otf").on_the_fly("e")<CR>', {silent = true, desc = "LuaSnip on the fly"})
+      require('luasnip').setup(opts)
+    end
   },
   -- completion
   {
@@ -27,6 +33,7 @@ return {
     event = 'InsertEnter',
     lazy = true,
     dependencies = {
+      'LuaSnip',
       'hrsh7th/cmp-buffer',
       'hrsh7th/cmp-nvim-lua',
       'hrsh7th/cmp-nvim-lsp',
@@ -35,7 +42,15 @@ return {
       'hrsh7th/cmp-cmdline',
       'hrsh7th/cmp-nvim-lsp-signature-help',
       'ray-x/cmp-treesitter',
-      'onsails/lspkind.nvim'
+      {
+        'onsails/lspkind.nvim',
+        opts = {
+          preset = 'default'
+        },
+        config = function (_, opts)
+          require('lspkind').init(opts)
+        end
+      }
     },
     opts = function()
       local cmp = require('cmp')
@@ -60,25 +75,25 @@ return {
         sources = {
           { name = 'nvim_lsp' },
           { name = 'luasnip' },
-          { name = 'nvim_lua' },
-          { name = 'buffer' , keyword_length = 5 },
           { name = 'nvim_lsp_signature_help' },
+          { name = 'nvim_lua' },
+          { name = 'buffer' , keyword_length = 7 },
           { name = 'treesitter' },
           { name = 'path' },
         },
-        cmp.setup.cmdline{ '/', '?' }, {
+        cmp.setup.cmdline({ '/', '?' }, {
           mapping = cmp.mapping.preset.cmdline(),
           sources = {
             { name = 'buffer' }
           }
-        },
+        }),
         cmp.setup.cmdline(':', {
           mapping = cmp.mapping.preset.cmdline(),
-          sources = cmp.config.sources{
+          sources = cmp.config.sources({
             { name = 'path' }
           }, {
             { name = 'cmdline' }
-          }
+          })
         })
       }
     end,
@@ -88,6 +103,18 @@ return {
     'echasnovski/mini.pairs',
     event = 'VeryLazy',
     lazy = true,
+    init = function ()
+      vim.api.nvim_create_autocmd(
+        {"BufEnter", "BufWinEnter"},
+        {
+          pattern = {"*.tex", "*.md"},
+          callback = function ()
+            require('mini.pairs').setup()
+            MiniPairs.map_buf(0, 'i', '$',
+              {action = 'closeopen', pair = '$$'})
+          end
+      })
+    end,
     config = function (_, opts)
       require('mini.pairs').setup(opts)
     end,

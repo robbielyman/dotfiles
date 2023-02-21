@@ -38,15 +38,22 @@ return {
           supercollider = vim.loop.os_uname().sysname ~= 'Linux' and {
             mason = false
           } or nil,
-          sumneko_lua = {
-            mason = false,
+          lua_ls = {
             settings = {
               Lua = {
                 workspace = {
-                  library = {
-                    vim.loop.os_uname().sysname == 'Linux' and '/home/rylee/src/norns/lua' or '/Users/rylee/src/norns/lua'
-                  },
+                  library = vim.loop.os_uname().sysname == 'Linux' and
+                    {
+                      '/home/rylee/src/norns/lua',
+                      '/home/rylee/src/neovim/runtime/lua'
+                    } or {
+                      '/Users/rylee/src/norns/lua',
+                      '/Users/rylee/src/neovim/runtime/lua'
+                    },
                   checkThirdParty = false,
+                },
+                completion = {
+                  callSnippet = "Replace"
                 },
                 telemetry = {
                   enable = false,
@@ -55,7 +62,6 @@ return {
             }
           },
           texlab = {
-            mason = false,
             settings = {
               texlab = {
                 chktex = {

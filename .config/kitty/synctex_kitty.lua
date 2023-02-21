@@ -16,7 +16,7 @@ for line in string.gmatch(json, "[^\r\n]+") do
   end
 end
 if not id then return end
-local command = "kitty @ --to unix:/tmp/kitty-$KITTY_PID send_text --match-tab id:"
+local command = "kitty @ --to unix:/tmp/kitty-$KITTY_PID send-text --match-tab id:"
   .. id
   .. " '^[ :e "
   .. path
