@@ -44,6 +44,9 @@ return {
         enabled = true,
         split = 'v'
       },
+      keymaps = {
+        send_node = "<Leader>n"
+      }
     }
   }
 }

@@ -69,16 +69,12 @@ return {
                   onOpenAndSave = true,
                 },
                 rootDirectory = ".",
-                forwardSearch = vim.loop.os_uname().sysname == 'Linux' and {
+                forwardSearch = {
                   executable = 'zathura',
                   args = {"--synctex-forward", "%l:1:%f", "%p"},
-                } or {
-                    executable = "/Applications/Skim.app/Contents/SharedSupport/displayline",
-                    args = {"%l", "%p", "%f"}
                   },
                 build = {
                   onSave = true,
-                  forwardSearchAfter = true
                 }
               }
             }

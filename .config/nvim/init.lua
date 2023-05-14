@@ -14,6 +14,7 @@ function R(name)
   return require(name)
 end
 
+vim.loader.enable()
 vim.cmd 'syntax enable'
 vim.cmd 'filetype plugin indent on'
 
@@ -41,6 +42,8 @@ set_opts {
   foldexpr = 'nvim_treesitter#foldexpr()',
   termguicolors = true,
   foldenable = false,
+  splitright = true,
+  splitbelow = true
 }
 
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"

@@ -16,6 +16,13 @@ return {
           branch = 'main'
         }
       }
+      parser_config.prolog = {
+        install_info = {
+          url = "https://github.com/Rukiza/tree-sitter-prolog",
+          files = { 'src/parser.c' },
+          branch = 'main'
+        }
+      }
       return {
         highlight = { enable = true },
         indent = { enable = true },

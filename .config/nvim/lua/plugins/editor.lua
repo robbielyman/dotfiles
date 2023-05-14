@@ -39,7 +39,7 @@ return {
     'ggandor/leap.nvim',
     lazy = true,
     event = 'VeryLazy',
-    dependencies = { 'ggandor/flit.nvim' },
+    dependencies = { 'flit' },
     config = function (_, opts)
       local leap = require 'leap'
       for key, value in pairs(opts) do
@@ -48,11 +48,30 @@ return {
       leap.add_default_mappings(true)
     end,
   },
+  {
+    'ggandor/flit.nvim',
+    name = 'flit',
+    lazy = true,
+    config = true
+  },
   -- NNN
   {
     'luukvbaal/nnn.nvim',
-    lazy = false,
+    lazy = true,
     cmd = {"NnnExplorer", "NnnPicker"},
+    event = "VeryLazy",
+    init = function ()
+      vim.g.loaded_netrw = 1
+      vim.g.loaded_netrwPlugin = 1
+      vim.g.loaded_netrwSettings = 1
+      vim.g.loaded_netrwFileHandlers = 1
+      pcall(vim.api.nvim_clear_autocmds, { group = "FileExplorer" })
+      vim.schedule(function ()
+        vim.api.nvim_create_autocmd({ "BufEnter", "BufNewFile" }, { callback = function ()
+          require("nnn").toggle('explorer', nil, "netrw")
+        end})
+      end)
+    end,
     opts = {
       replace_netrw = 'explorer'
     }

@@ -13,5 +13,9 @@ return {
     'nvim-tree/nvim-web-devicons',
     module = true,
     lazy = true
+  },
+  {
+    'andweeb/presence.nvim',
+    event = "VeryLazy"
   }
 }

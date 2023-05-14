@@ -53,7 +53,7 @@ return {
       sections = {
         lualine_b = { {'diff', diff_source }, },
         lualine_x = {'encoding', wttr_comp, 'filetype'}, },
-      extensions = { 'quickfix' }
+      extensions = { 'trouble', 'lazy' }
     }
   },
   {

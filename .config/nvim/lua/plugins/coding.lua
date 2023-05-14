@@ -107,11 +107,23 @@ return {
       vim.api.nvim_create_autocmd(
         {"BufEnter", "BufWinEnter"},
         {
-          pattern = {"*.tex", "*.md"},
+          pattern = {"*.tex"},
           callback = function ()
             require('mini.pairs').setup()
             MiniPairs.map_buf(0, 'i', '$',
               {action = 'closeopen', pair = '$$'})
+            vim.keymap.set('i', "'", "'", { buffer = true})
+            vim.keymap.set('i', "`", "`", { buffer = true})
+          end
+      })
+      vim.api.nvim_create_autocmd(
+        {"BufEnter", "BufWinEnter"},
+        {
+          pattern = {"*.md"},
+          callback = function ()
+            require('mini.pairs').setup()
+            MiniPairs.map_buf(0, 'i', '$',
+              {action = 'closeopen', pair = '$$' })
           end
       })
     end,
