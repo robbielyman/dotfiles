@@ -1,0 +1,616 @@
+
+* Emacs Configuration
+:PROPERTIES:
+:header-args: :tangle ~/.emacs.d/init.el
+:END:
+** Package Managers
+*** Straight.el
+
+It's kind of annoying that I need =straight.el= as well as =package.el=.
+I only use it for [[*LSP][LSP]] integration,
+so if that gets added to a package archive,
+or if [[*Eglot][Eglot]] starts supporting [[*Tempel][Tempel]],
+I can delete this.
+
+#+begin_src emacs-lisp
+  (defvar bootstrap-version)
+  (let ((bootstrap-file
+         (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+        (bootstrap-version 6))
+    (unless (file-exists-p bootstrap-file)
+      (with-current-buffer
+          (url-retrieve-synchronously
+           "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
+           'silent 'inhibit-cookies)
+        (goto-char (point-max))
+        (eval-print-last-sexp)))
+    (load bootstrap-file nil 'nomessage))
+#+end_src
+
+*** Package.el, MELPA, and Use-Package
+
+This is the real bread and butter.
+=package.el= downloads and installs packages;
+=MELPA= is a repository of such packages,
+and =use-package= is a helpful macro system that also supports lazy-loading.
+
+#+begin_src emacs-lisp
+  (require 'package)
+  (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+  (package-initialize)
+
+  (eval-when-compile
+    (require 'use-package)
+    (setq use-package-always-ensure t))
+
+  (unless (package-installed-p 'usepackage)
+    (package-refresh-contents)
+    (package-install 'use-package))
+#+end_src
+** Miscellaneous Settings
+#+begin_src emacs-lisp :tangle ~/.emacs.d/early-init.el
+  (add-to-list 'default-frame-alist '(undecorated . t))
+#+end_src
+
+#+begin_src emacs-lisp
+  (use-package emacs
+    :ensure nil
+    :preface
+    (defvar ryl/indent-width 2)
+    (defun ryl/check-darwin (filename)
+      (if (equal system-type 'darwin) filename "no"))
+    (defun ryl/check-linux (filename)
+      (if (equal system-type 'gnu/linux) filename "no"))
+    :custom
+    (minibuffer-prompt-properties '(read-only t cursor-intangible t))
+    (completion-cycle-threshold 3)
+    (read-extended-command-predicate #'command-completion-default-include-p)
+    (tab-always-indent 'complete)
+    (enable-recursive-minibuffers t)
+    (scroll-margin 0)
+    (scroll-conservatively 101)
+    (scroll-preserve-screen-position t)
+    (auto-window-vscroll nil)
+    (custom-file "~/.config/emacs-customize.el")
+    :init
+    (load custom-file)
+    (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
+    (add-hook 'window-setup-hook 'toggle-frame-maximized t)
+    (setq-default indent-tabs-mode nil
+                  tab-width ryl/indent-width)
+    (set-fringe-mode 10))
+
+  (use-package scroll-bar
+  :ensure nil
+  :config (scroll-bar-mode -1))
+
+#+end_src
+
+** EVIL MODE
+Let's load this quickly so that if other parts of our configuration fail,
+we still have Evil set up.
+
+#+begin_src emacs-lisp
+  (use-package evil
+    :init
+    (setq evil-want-C-u-scroll t
+          evil-want-keybinding nil
+          evil-shift-width ryl/indent-width)
+    :hook (after-init . evil-mode)
+    :preface
+    (defun ryl/save-and-kill-this-buffer ()
+      (interactive)
+      (save-buffer)
+      (kill-this-buffer))
+    :config
+    (with-eval-after-load 'evil-maps
+      (define-key evil-insert-state-map (kbd "C-n") nil)
+      (define-key evil-insert-state-map (kbd "C-p") nil))
+    (evil-ex-define-cmd "q" #'kill-this-buffer)
+    (evil-ex-define-cmd "wq" #'ryl/save-and-kill-this-buffer))
+
+  (use-package evil-collection
+    :after evil-mode
+    :custom evil-collection-company-use-tng nil
+    :config (evil-collection-init))
+
+  (use-package evil-commentary
+    :after evil
+    :diminish
+    :config (evil-commentary-mode +1))
+#+end_src
+**** TODO What are the keybindings of evil-commentary?
+** Miscellaneous Continued
+#+begin_src emacs-lisp
+  (use-package diminish
+    :demand t)
+
+  (use-package elcord
+    :demand t
+    :config (elcord-mode))
+#+end_src
+** UI Tweaks
+*** Fonts
+It's sort of a shame that the =ligature= package doesn't appear to let you set
+arbitrary length ligatures; would be nice to have any number of tildes and dashes working.
+Avenir next might have to be changed on Linux...
+
+#+begin_src emacs-lisp 
+  (defvar ryl/default-font-size 130)
+  (set-face-attribute 'default nil :font "Iosevka Custom" :height ryl/default-font-size)
+  (set-face-attribute 'fixed-pitch nil :font "Iosevka Custom" :height ryl/default-font-size)
+  (set-face-attribute 'variable-pitch nil :font "Avenir Next" :height ryl/default-font-size)
+  (set-frame-width nil 200)
+  (set-frame-height nil 50)
+
+#+end_src
+
+#+RESULTS:
+
+#+begin_src emacs-lisp
+  (use-package ligature
+    :config
+    (ligature-set-ligatures 'prog-mode
+                            '("<->" "<-->" "<--->" "<---->" "<----->"  "<=>" "<==>" "<===>"
+                              "<====>" "<=====>"  "<**>" "<***>" "<****>" "<*****>"
+                              "<!--" "<!---"  "<$" "<$>" "$>" "<." "<.>" ".>"
+                              "<*" "<*>" "*>" "<\\" "<\\>" "\\>" "</" "</>" "/>" "<\""
+                              "<\">" "\">" "<'" "<'>" "'>" "<^" "<^>" "^>" "<&" "<&>"
+                              "&>" "<%" "<%>" "%>" "<@" "<@>" "@>" "<#" "<#>" "#>"
+                              "<+" "<+>" "+>" "<-" "<->" "->" "<!" "<!>" "!>" "<?"
+                              "<?>" "?>" "<|" "<|>" "|>" "<:" "<:>" ":>"
+                              "::" ":::" "::::"  "->" "->-" "->--" "->>" "->>-"
+                              "->>--" "->>>" "->>>-" "->>>--" "-->" "-->-" "-->--" "-->>"
+                              "-->>-" "-->>--" "-->>>" "-->>>-" "-->>>--" ">-" ">--" ">>-"
+                              ">>--" ">>>-" ">>>--" "=>" "=>=" "=>==" "=>>" "=>>=" "=>>=="
+                              "=>>>" "=>>>=" "=>>>==" "==>" "==>=" "==>==" "==>>" "==>>="
+                              "==>>==" "==>>>" "==>>>=" "==>>>==" ">=" ">==" ">>=" ">>=="
+                              ">>>=" ">>>==" "<-" "-<-" "--<-" "<<-" "-<<-" "--<<-" "<<<-"
+                              "-<<<-" "--<<<-" "<--" "-<--" "--<--" "<<--" "-<<--" "--<<--"
+                              "<<<--" "-<<<--" "--<<<--" "-<" "--<" "-<<" "--<<" "-<<<"
+                              "--<<<" "<=" "=<=" "==<=" "<<=" "=<<=" "==<<=" "<<<=" "=<<<="
+                              "==<<<=" "<==" "=<==" "==<==" "<<==" "=<<==" "==<<==" "<<<=="
+                              "=<<<==" "==<<<==" "=<" "==<" "=<<" "==<<" "=<<<" "==<<<"
+                              ">=>" ">->" ">-->" ">==>" "<=<" "<-<" "<--<" "<==<"  ">>"
+                              ">>>" "<<" "<<<"  ":+" ":-" ":=" "+:" "-:" "=:" "=^"
+                              "=+" "=-" "=*" "=/" "=%" "^=" "+=" "-=" "*=" "/=" "%="
+                              "/\\" "--" "~~" "---" "~~~" "==" "==="
+                              "-----" "~~~~~" "-----------" "~~~~~~~~~~"
+                              "\\/"  "<>" "<+" "<+>" "+>"))
+    (global-ligature-mode t))
+#+end_src
+*** Indentation
+To be honest, I'm not sure what "awk" and "k&r" styles are precisely...
+#+begin_src emacs-lisp
+  (use-package cc-vars
+    :ensure nil
+    :custom
+    (c-default-style '((awk-mode . "awk")
+                       (other . "k&r")))
+    :config
+    (setq-default c-basic-offset ryl/indent-width))
+
+  (use-package lua-mode
+    :ensure nil
+    :interpreter ("lua" . lua-mode)
+    :custom
+    (lua-indent-level 2))
+
+  (use-package python
+    :ensure nil
+    :mode ("\\.py\\'" . python-mode)
+    :interpreter ("python" . python-mode)
+    :custom (python-indent-offset ryl/indent-width))
+#+end_src
+*** Dashboard
+#+begin_src emacs-lisp
+  (use-package all-the-icons
+    :if (display-graphic-p))
+
+  (use-package dashboard
+    :config
+    (dashboard-setup-startup-hook)
+    :custom
+    (dashboard-startup-banner "~/.emacs.d/alanza.png")
+    (dashboard-banner-logo-title "You wake up early in the morning and you work all day; that's the only secret.")
+    (dashboard-center-content t)
+    (dashboard-items '((recents . 5)
+                       (bookmarks . 5)
+                       (agenda . 5)
+                       (registers . 5)))
+    (dashboard-icon-type 'all-the-icons)
+    (dashboard-set-file-icons t))
+#+end_src
+** Org Mode
+#+begin_src emacs-lisp
+  (use-package org
+    :mode ("\\.org\\'" . org-mode)
+    :hook ((org-mode . visual-line-mode)
+           (org-mode . org-indent-mode))
+    :custom
+    (org-publish-project-alist
+     '(("ryleelyman.github.io"
+        :base-directory "~/Site/_org"
+        :base-extension "org"
+        :publishing-directory "~/Site/_posts"
+        :recursive t
+        :publishing-function org-html-publish-to-html
+        :headline-levels 4
+        :html-extension "html"
+        :body-only t))))
+
+  (with-eval-after-load 'org
+    (org-babel-do-load-languages
+        'org-babel-load-languages
+        '((emacs-lisp . t)
+          (python . t)
+          (lua . t)))
+
+    (push '("conf-unix" . conf-unix) org-src-lang-modes))
+    
+  (use-package conf-mode)
+  
+  (use-package org-bullets
+    :hook (org-mode . org-bullets-mode))
+#+end_src
+
+** LaTeX
+Somehow I'm back to using different PDF viewers on macOS vs Linux. Sigh-oyek.
+
+#+NAME: PDF-VIEWER
+#+begin_src emacs-lisp :tangle no
+  (if (eq system-type 'darwin) "\"Sioyek\"" "\"Zathura\"")
+#+end_src
+
+ #+begin_src emacs-lisp :noweb yes
+    (use-package tex
+      :ensure auctex
+      :mode ("\\.tex\\'" . tex-mode)
+      :config
+      (setq-default TeX-master "main")
+      (add-hook 'LaTeX-mode-hook 'TeX-source-correlate-mode)
+      (add-to-list 'TeX-expand-list
+                   '("%sn" (lambda () server-name)))
+      (add-to-list 'TeX-view-program-list
+                   '(("Zathura"
+                     ("zathura "
+                      (mode-io-correlate "--synctex-forward %n:0:\"%b\" -x \"emacsclient --socket-name=%sn +%{line} %{input}\" ")
+                      "%o")
+                     "zathura"))
+                   ("Sioyek"
+                    ("sioyek "
+                     (mode-io-correlate "--inverse-search \"emacsclient --socket-name=%sn +%2 %1\" --forward-search-file \"%b\" --forward-search-line %n ")
+                     "%o")
+                    "sioyek"))
+      (add-to-list 'TeX-view-program-selection
+                   '(output-pdf <<PDF-VIEWER()>>))
+      :custom
+      (TeX-PDF-mode t)
+      (TeX-source-correlate-mode t)
+      (TeX-source-correlate-start-server t)
+      (preview-image-type 'dvisvgm))
+
+    (use-package auctex-latexmk
+      :after tex
+      :config (auctex-latexmk-setup))
+
+    (use-package preview-dvisvgm
+      :after tex)
+#+end_src
+
+** Programming
+*** Parentheses, Pairs
+#+begin_src emacs-lisp
+  (use-package paren
+    :ensure nil
+    :custom (show-paren-delay 0)
+    :config (show-paren-mode +1))
+
+  (use-package elec-pair
+    :ensure nil
+    :hook (prog-mode . electric-pair-mode))
+#+end_src
+*** Escape Sequences
+#+begin_src emacs-lisp
+  (use-package highlight-escape-sequences
+    :hook (prog-mode . hes-mode))
+#+end_src
+*** Linting
+#+begin_src emacs-lisp
+  (use-package flycheck
+    :config (global-flycheck-mode +1))
+#+end_src
+*** Git
+#+begin_src emacs-lisp
+  (use-package magit
+    :bind ("C-x g" . magit-status)
+    :config (add-hook 'with-editor-mode-hook #'evil-insert-state))
+#+end_src
+Also setup yadm, which requires tramp.
+#+begin_src emacs-lisp
+  (use-package tramp
+    :config
+    (add-to-list 'tramp-methods
+                 '("yadm"
+                   (tramp-login-program "yadm")
+                   (tramp-login-args (("enter")))
+                   (tramp-login-env (("SHELL") ("/bin/sh")))
+                   (tramp-remote-shell "/bin/sh")
+                   (tramp-remote-shell-args ("-c")))))
+
+  (defun yadm ()
+    (interactive)
+    (magit-status "/yadm::"))
+#+end_src
+
+*** Completion
+#+begin_src emacs-lisp
+  (use-package orderless
+    :custom
+    (completion-styles '(orderless basic))
+    (completion-category-defaults nil)
+    (completion-category-overrides '((file (styles partial-completion)))))
+
+  (use-package corfu
+    :custom
+    (corfu-cycle t)
+    :config
+    (global-corfu-mode 1))
+
+  (use-package kind-icon
+    :after corfu
+    :custom (kind-icon-default-face 'corfu-default)
+    :config
+    (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
+#+end_src
+*** Minibuffer "Telescope"
+#+begin_src emacs-lisp
+  (use-package vertico
+    :custom (vertico-resize t)
+    (vertico-cycle t)
+    :init (vertico-mode))
+#+end_src
+*** Snippets
+#+begin_src emacs-lisp
+  (use-package tempel
+    :init
+    (defun tempel-setup-capf ()
+      (setq-local completion-at-point-functions
+                  (cons #'tempel-expand
+                        completion-at-point-functions)))
+    (add-hook 'prog-mode-hook 'tempel-setup-capf)
+    (add-hook 'text-mode-hook 'tempel-setup-capf))
+
+  (use-package lsp-snippet-tempel
+    :straight (lsp-snippet-tempel :type git
+                                  :host github
+                                  :repo "svaante/lsp-snippet")
+    :config
+    (when (featurep 'eglot)
+      (lsp-snippet-tempel-eglot-init)))
+#+end_src
+*** LSP
+Do I have to do anything else? Even this at all?
+#+begin_src emacs-lisp
+  (use-package eglot
+    :ensure nil)
+#+end_src
+*** Which-Key
+#+begin_src emacs-lisp
+  (use-package which-key
+    :custom
+    (which-key-show-early-on-C-h t)
+    (which-key-idle-delay 2000)
+    (which-key-idle-secondary-delay 0.05)
+    :config (which-key-mode))
+#+end_src
+** Theme
+I'm still not 100% sold on this, but it'll do for now.
+#+begin_src emacs-lisp
+  (use-package kaolin-themes
+    :config
+    (load-theme 'kaolin-bubblegum t)
+    (kaolin-treemacs-theme))
+#+end_src
+
+* Yabai                                                      
+
+#+begin_src conf :tangle (ryl/check-darwin ".config/yabai/yabairc")
+    yabai -m config                                 \
+          mouse_follows_focus         off           \
+          focus_follows_mouse         on            \
+          window_origin_display       default       \
+          window_placement            second_child  \
+          window_zoom_persist         on            \
+          window_topmost              off           \
+          window_shadow               on            \
+          window_animation_duration   0.3           \
+          window_animation_frame_rate 120           \
+          window_opacity_duration     0.1           \
+          active_window_opacity       1.0           \
+          normal_window_opacity       0.85          \
+          window_opacity              on            \
+          insert_feedback_color       0xffd75f5f    \
+          window_border               off           \
+          split_ratio                 0.5           \
+          split_type                  auto          \
+          auto_balance                off           \
+          top_padding                 12            \
+          bottom_padding              12            \
+          left_padding                12            \
+          right_padding               12            \
+          window_gap                  35            \
+          layout                      bsp           \
+          mouse_modifier              fn            \
+          mouse_action1               move          \
+          mouse_action2               resize        \
+          mouse_drop_action           swap
+
+#+end_src
+
+* SKHD                                                       
+
+#+begin_src conf :tangle (ryl/check-darwin "~/.config/skhd/skhdrc")
+  :: default
+
+  cmd - return : /Applications/kitty.app/Contents/MacOS/kitty --single-instance -d ~
+
+  cmd - h : yabai -m window --focus west
+  cmd - j : yabai -m window --focus south
+  cmd - k : yabai -m window --focus north
+  cmd - l : yabai -m window --focus east
+
+  shift + cmd - h : yabai -m window --warp west
+  shift + cmd - j : yabai -m window --warp south
+  shift + cmd - k : yabai -m window --warp north
+  shift + cmd - l : yabai -m window --warp east
+
+  cmd - 1 : yabai -m space --focus 1
+  cmd - 2 : yabai -m space --focus 2
+  cmd - 3 : yabai -m space --focus 3
+  cmd - 4 : yabai -m space --focus 4
+  cmd - 5 : yabai -m space --focus 5
+  cmd - 6 : yabai -m space --focus 6
+  cmd - 7 : yabai -m space --focus 7
+  cmd - 8 : yabai -m space --focus 8
+  cmd - 9 : yabai -m space --focus 9
+
+  cmd + shift - 1 : yabai -m window --space 1
+  cmd + shift - 2 : yabai -m window --space 2
+  cmd + shift - 3 : yabai -m window --space 3
+  cmd + shift - 4 : yabai -m window --space 4
+  cmd + shift - 5 : yabai -m window --space 5
+  cmd + shift - 6 : yabai -m window --space 6
+  cmd + shift - 7 : yabai -m window --space 7
+  cmd + shift - 8 : yabai -m window --space 8
+  cmd + shift - 9 : yabai -m window --space 9
+
+  :: resize @ :
+
+  cmd - escape ; resize
+
+  resize < escape ; default
+
+  resize < left : yabai -m window --resize left:-25:0
+  resize < down : yabai -m window --resize bottom:0:25
+  resize < up : yabai -m window --resize top:0:-25
+  resize < right : yabai -m window --resize right:25:0
+
+  resize < h : yabai -m window --resize left:-25:0
+  resize < j : yabai -m window --resize bottom:0:25
+  resize < k : yabai -m window --resize top:0:-25
+  resize < l : yabai -m window --resize right:25:0
+#+end_src
+
+* Zathura
+
+#+begin_src conf :tangle (ryl/check-linux "~/.config/zathura/zathurarc")
+  set selection-clipboard clipboard
+  set synctex true
+#+end_src
+
+* Kitty
+
+#+begin_src conf :tangle "~/.config/kitty/kitty.conf"
+  listen_on unix:/tmp/kitty
+  allow_remote_control  yes
+
+  hide_window_decorations yes
+
+  font_family      Iosevka Custom Extended
+  italic_font      Iosevka Custom Extended Italic
+  bold_font        Iosevka Custom Heavy Extended 
+  bold_italic_font Iosevka Custom Heavy Extended Italic
+
+  symbol_map U+23fb-23fe,U+2665,U+26a1,U+2b58,U+e000-U+e00a Symbols Nerd Font Mono
+  symbol_map U+e0a0-U+e0a3,U+e0b0-U+e0c8,U+e0ca,U+e0cc-U+e0d4 Symbols Nerd Font Mono
+  symbol_map U+e200-U+e2a9,U+e300-U+e3eb,U+e5fa-U+e631,U+e700-U+e7c5 Symbols Nerd Font Mono
+  symbol_map U+ea60-U+ebeb,U+f000-U+f2e0,U+f300-U+f32f,U+f400-U+f4a9 Symbols Nerd Font Mono
+  symbol_map U+f500-U+fd46 Symbols Nerd Font Mono
+
+  font_size 13.0
+  disable_ligatures never
+
+  map ctrl+1 goto_tab 1
+  map ctrl+2 goto_tab 2
+  map ctrl+3 goto_tab 3
+  map ctrl+4 goto_tab 4
+  map ctrl+5 goto_tab 5
+  map ctrl+6 goto_tab 6
+  map ctrl+7 goto_tab 7
+  map ctrl+8 goto_tab 8
+  map ctrl+9 goto_tab 9
+
+  background_opacity 0.85
+
+  # The basic colors
+  foreground              #C6D0F5
+  background              #303446
+  selection_foreground    #303446
+  selection_background    #F2D5CF
+
+  # Cursor colors
+  cursor                  #F2D5CF
+  cursor_text_color       #303446
+
+  # URL underline color when hovering with mouse
+  url_color               #F2D5CF
+
+  # Kitty window border colors
+  active_border_color     #BABBF1
+  inactive_border_color   #737994
+  bell_border_color       #E5C890
+
+  # OS Window titlebar colors
+  wayland_titlebar_color system
+  macos_titlebar_color system
+
+  # Tab bar colors
+  active_tab_foreground   #232634
+  active_tab_background   #CA9EE6
+  inactive_tab_foreground #C6D0F5
+  inactive_tab_background #292C3C
+  tab_bar_background      #232634
+
+  # Colors for marks (marked text in the terminal)
+  mark1_foreground #303446
+  mark1_background #BABBF1
+  mark2_foreground #303446
+  mark2_background #CA9EE6
+  mark3_foreground #303446
+  mark3_background #85C1DC
+
+  # The 16 terminal colors
+
+  # black
+  color0 #51576D
+  color8 #626880
+
+  # red
+  color1 #E78284
+  color9 #E78284
+
+  # green
+  color2  #A6D189
+  color10 #A6D189
+
+  # yellow
+  color3  #E5C890
+  color11 #E5C890
+
+  # blue
+  color4  #8CAAEE
+  color12 #8CAAEE
+
+  # magenta
+  color5  #F4B8E4
+  color13 #F4B8E4
+
+  # cyan
+  color6  #81C8BE
+  color14 #81C8BE
+
+  # white
+  color7  #B5BFE2
+  color15 #A5ADCE
+#+end_src
