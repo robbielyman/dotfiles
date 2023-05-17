@@ -41,6 +41,7 @@
   (scroll-conservatively 101)
   (scroll-preserve-screen-position t)
   (auto-window-vscroll nil)
+  (set-fringe-mode 10)
   (custom-file "~/.config/emacs-customize.el")
   :init
   (load custom-file)
@@ -89,10 +90,14 @@
   :demand t
   :config (elcord-mode))
 
+(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+(global-set-key (kbd "C-M-u") 'universal-argument)
+
 (defvar ryl/default-font-size 130)
-(set-face-attribute 'default nil :font "Iosevka Custom" :height ryl/default-font-size)
-(set-face-attribute 'fixed-pitch nil :font "Iosevka Custom" :height ryl/default-font-size)
-(set-face-attribute 'variable-pitch nil :font "Avenir Next" :height ryl/default-font-size)
+(set-face-attribute 'default nil :weight 'light :family "Iosevka Custom" :height ryl/default-font-size)
+(set-face-attribute 'bold nil :weight 'heavy)
+(set-face-attribute 'fixed-pitch nil :family "Iosevka Custom" :height ryl/default-font-size)
+(set-face-attribute 'variable-pitch nil :family "Avenir Next" :height ryl/default-font-size)
 (set-frame-width nil 200)
 (set-frame-height nil 50)
 
@@ -126,6 +131,13 @@
                             "-----" "~~~~~" "-----------" "~~~~~~~~~~"
                             "\\/"  "<>" "<+" "<+>" "+>"))
   (global-ligature-mode t))
+
+(use-package moody
+  :config
+  (setq x-underline-at-descent-line t)
+  (moody-replace-mode-line-buffer-identification)
+  (moody-replace-vc-mode)
+  (moody-replace-eldoc-minibuffer-message-function))
 
 (use-package cc-vars
   :ensure nil
@@ -169,6 +181,9 @@
   :hook ((org-mode . visual-line-mode)
          (org-mode . org-indent-mode))
   :custom
+  (org-ellipsis " ▾")
+  (org-src-fontify-natively t)
+  (org-fontify-quote-and-verse-blocks t)
   (org-publish-project-alist
    '(("ryleelyman.github.io"
       :base-directory "~/Site/_org"
@@ -185,6 +200,7 @@
       'org-babel-load-languages
       '((emacs-lisp . t)
         (python . t)
+        (shell . t)
         (lua . t)))
 
   (push '("conf-unix" . conf-unix) org-src-lang-modes))
@@ -193,6 +209,17 @@
 
 (use-package org-bullets
   :hook (org-mode . org-bullets-mode))
+
+
+(defun ryl/org-babel-tangle-config ()
+  (when (or (string-equal (buffer-file-name)
+                          (expand-file-name "~/system.org"))
+            (string-equal (buffer-file-name)
+                          (expand-file-name "~/src/moire/moire-theme.org")))
+    (let ((org-confirm-babel-evaluate nil))
+      (org-babel-tangle))))
+
+(add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'ryl/org-babel-tangle-config)))
 
 (use-package tex
   :ensure auctex
@@ -207,12 +234,12 @@
                  ("zathura "
                   (mode-io-correlate "--synctex-forward %n:0:\"%b\" -x \"emacsclient --socket-name=%sn +%{line} %{input}\" ")
                   "%o")
-                 "zathura"))
+                 "zathura")
                ("Sioyek"
                 ("sioyek "
                  (mode-io-correlate "--inverse-search \"emacsclient --socket-name=%sn +%2 %1\" --forward-search-file \"%b\" --forward-search-line %n ")
                  "%o")
-                "sioyek"))
+                "sioyek")))
   (add-to-list 'TeX-view-program-selection
                '(output-pdf "Sioyek"))
   :custom
@@ -247,6 +274,10 @@
   :bind ("C-x g" . magit-status)
   :config (add-hook 'with-editor-mode-hook #'evil-insert-state))
 
+(use-package diff-hl
+  :config (global-diff-hl-mode))
+(global-display-line-numbers-mode)
+
 (use-package tramp
   :config
   (add-to-list 'tramp-methods
@@ -269,6 +300,7 @@
 
 (use-package corfu
   :custom
+  (corfu-auto t)
   (corfu-cycle t)
   :config
   (global-corfu-mode 1))
@@ -307,11 +339,15 @@
 (use-package which-key
   :custom
   (which-key-show-early-on-C-h t)
-  (which-key-idle-delay 2000)
+  (which-key-idle-delay 2)
   (which-key-idle-secondary-delay 0.05)
   :config (which-key-mode))
 
-(use-package kaolin-themes
-  :config
-  (load-theme 'kaolin-bubblegum t)
-  (kaolin-treemacs-theme))
+(add-to-list 'custom-theme-load-path "~/src/moire")
+(load-theme 'moire)
+(let ((line (face-attribute 'mode-line :underline)))
+  (set-face-attribute 'mode-line          nil :overline   line)
+  (set-face-attribute 'mode-line-inactive nil :overline   line)
+  (set-face-attribute 'mode-line-inactive nil :underline  line)
+  (set-face-attribute 'mode-line          nil :box        nil)
+  (set-face-attribute 'mode-line-inactive nil :box        nil))

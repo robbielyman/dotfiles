@@ -71,6 +71,7 @@ and =use-package= is a helpful macro system that also supports lazy-loading.
     (scroll-conservatively 101)
     (scroll-preserve-screen-position t)
     (auto-window-vscroll nil)
+    (set-fringe-mode 10)
     (custom-file "~/.config/emacs-customize.el")
     :init
     (load custom-file)
@@ -128,6 +129,9 @@ we still have Evil set up.
   (use-package elcord
     :demand t
     :config (elcord-mode))
+
+  (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+  (global-set-key (kbd "C-M-u") 'universal-argument)
 #+end_src
 ** UI Tweaks
 *** Fonts
@@ -137,15 +141,14 @@ Avenir next might have to be changed on Linux...
 
 #+begin_src emacs-lisp 
   (defvar ryl/default-font-size 130)
-  (set-face-attribute 'default nil :font "Iosevka Custom" :height ryl/default-font-size)
-  (set-face-attribute 'fixed-pitch nil :font "Iosevka Custom" :height ryl/default-font-size)
-  (set-face-attribute 'variable-pitch nil :font "Avenir Next" :height ryl/default-font-size)
+  (set-face-attribute 'default nil :weight 'light :family "Iosevka Custom" :height ryl/default-font-size)
+  (set-face-attribute 'bold nil :weight 'heavy)
+  (set-face-attribute 'fixed-pitch nil :family "Iosevka Custom" :height ryl/default-font-size)
+  (set-face-attribute 'variable-pitch nil :family "Avenir Next" :height ryl/default-font-size)
   (set-frame-width nil 200)
   (set-frame-height nil 50)
 
 #+end_src
-
-#+RESULTS:
 
 #+begin_src emacs-lisp
   (use-package ligature
@@ -179,6 +182,16 @@ Avenir next might have to be changed on Linux...
                               "\\/"  "<>" "<+" "<+>" "+>"))
     (global-ligature-mode t))
 #+end_src
+*** Mode-Line
+#+begin_src emacs-lisp
+  (use-package moody
+    :config
+    (setq x-underline-at-descent-line t)
+    (moody-replace-mode-line-buffer-identification)
+    (moody-replace-vc-mode)
+    (moody-replace-eldoc-minibuffer-message-function))
+#+end_src
+
 *** Indentation
 To be honest, I'm not sure what "awk" and "k&r" styles are precisely...
 #+begin_src emacs-lisp
@@ -228,6 +241,9 @@ To be honest, I'm not sure what "awk" and "k&r" styles are precisely...
     :hook ((org-mode . visual-line-mode)
            (org-mode . org-indent-mode))
     :custom
+    (org-ellipsis " ▾")
+    (org-src-fontify-natively t)
+    (org-fontify-quote-and-verse-blocks t)
     (org-publish-project-alist
      '(("ryleelyman.github.io"
         :base-directory "~/Site/_org"
@@ -244,14 +260,26 @@ To be honest, I'm not sure what "awk" and "k&r" styles are precisely...
         'org-babel-load-languages
         '((emacs-lisp . t)
           (python . t)
+          (shell . t)
           (lua . t)))
 
     (push '("conf-unix" . conf-unix) org-src-lang-modes))
-    
+
   (use-package conf-mode)
-  
+
   (use-package org-bullets
     :hook (org-mode . org-bullets-mode))
+
+
+  (defun ryl/org-babel-tangle-config ()
+    (when (or (string-equal (buffer-file-name)
+                            (expand-file-name "~/system.org"))
+              (string-equal (buffer-file-name)
+                            (expand-file-name "~/src/moire/moire-theme.org")))
+      (let ((org-confirm-babel-evaluate nil))
+        (org-babel-tangle))))
+
+  (add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'ryl/org-babel-tangle-config)))
 #+end_src
 
 ** LaTeX
@@ -259,7 +287,7 @@ Somehow I'm back to using different PDF viewers on macOS vs Linux. Sigh-oyek.
 
 #+NAME: PDF-VIEWER
 #+begin_src emacs-lisp :tangle no
-  (if (eq system-type 'darwin) "\"Sioyek\"" "\"Zathura\"")
+  (if (eq system-type 'darwin) "Sioyek" "Zathura")
 #+end_src
 
  #+begin_src emacs-lisp :noweb yes
@@ -276,14 +304,14 @@ Somehow I'm back to using different PDF viewers on macOS vs Linux. Sigh-oyek.
                      ("zathura "
                       (mode-io-correlate "--synctex-forward %n:0:\"%b\" -x \"emacsclient --socket-name=%sn +%{line} %{input}\" ")
                       "%o")
-                     "zathura"))
+                     "zathura")
                    ("Sioyek"
                     ("sioyek "
                      (mode-io-correlate "--inverse-search \"emacsclient --socket-name=%sn +%2 %1\" --forward-search-file \"%b\" --forward-search-line %n ")
                      "%o")
-                    "sioyek"))
+                    "sioyek")))
       (add-to-list 'TeX-view-program-selection
-                   '(output-pdf <<PDF-VIEWER()>>))
+                   '(output-pdf "<<PDF-VIEWER()>>"))
       :custom
       (TeX-PDF-mode t)
       (TeX-source-correlate-mode t)
@@ -310,22 +338,30 @@ Somehow I'm back to using different PDF viewers on macOS vs Linux. Sigh-oyek.
     :ensure nil
     :hook (prog-mode . electric-pair-mode))
 #+end_src
+
 *** Escape Sequences
 #+begin_src emacs-lisp
   (use-package highlight-escape-sequences
     :hook (prog-mode . hes-mode))
 #+end_src
+
 *** Linting
 #+begin_src emacs-lisp
   (use-package flycheck
     :config (global-flycheck-mode +1))
 #+end_src
+
 *** Git
 #+begin_src emacs-lisp
-  (use-package magit
-    :bind ("C-x g" . magit-status)
-    :config (add-hook 'with-editor-mode-hook #'evil-insert-state))
+    (use-package magit
+      :bind ("C-x g" . magit-status)
+      :config (add-hook 'with-editor-mode-hook #'evil-insert-state))
+
+    (use-package diff-hl
+      :config (global-diff-hl-mode))
+    (global-display-line-numbers-mode)
 #+end_src
+
 Also setup yadm, which requires tramp.
 #+begin_src emacs-lisp
   (use-package tramp
@@ -353,6 +389,7 @@ Also setup yadm, which requires tramp.
 
   (use-package corfu
     :custom
+    (corfu-auto t)
     (corfu-cycle t)
     :config
     (global-corfu-mode 1))
@@ -400,18 +437,24 @@ Do I have to do anything else? Even this at all?
   (use-package which-key
     :custom
     (which-key-show-early-on-C-h t)
-    (which-key-idle-delay 2000)
+    (which-key-idle-delay 2)
     (which-key-idle-secondary-delay 0.05)
     :config (which-key-mode))
 #+end_src
 ** Theme
-I'm still not 100% sold on this, but it'll do for now.
+
 #+begin_src emacs-lisp
-  (use-package kaolin-themes
-    :config
-    (load-theme 'kaolin-bubblegum t)
-    (kaolin-treemacs-theme))
-#+end_src
+  (add-to-list 'custom-theme-load-path "~/src/moire")
+  (load-theme 'moire)
+  (let ((line (face-attribute 'mode-line :underline)))
+    (set-face-attribute 'mode-line          nil :overline   line)
+    (set-face-attribute 'mode-line-inactive nil :overline   line)
+    (set-face-attribute 'mode-line-inactive nil :underline  line)
+    (set-face-attribute 'mode-line          nil :box        nil)
+    (set-face-attribute 'mode-line-inactive nil :box        nil))
+    #+end_src
+
+#+RESULTS:
 
 * Yabai                                                      
 
@@ -511,14 +554,19 @@ I'm still not 100% sold on this, but it'll do for now.
 
 * Kitty
 
-#+begin_src conf :tangle "~/.config/kitty/kitty.conf"
+#+NAME: tru-colors-list
+#+begin_src emacs-lisp :tangle no :var tab=~/src/moire/moire-theme.org:moire-colors[,1] :var num=11
+  (nth num tab)
+#+end_src
+
+#+begin_src conf :tangle "~/.config/kitty/kitty.conf" :noweb yes 
   listen_on unix:/tmp/kitty
   allow_remote_control  yes
 
   hide_window_decorations yes
 
-  font_family      Iosevka Custom Extended
-  italic_font      Iosevka Custom Extended Italic
+  font_family      Iosevka Custom Extended Light 
+  italic_font      Iosevka Custom Extended Light Italic
   bold_font        Iosevka Custom Heavy Extended 
   bold_italic_font Iosevka Custom Heavy Extended Italic
 
@@ -544,73 +592,74 @@ I'm still not 100% sold on this, but it'll do for now.
   background_opacity 0.85
 
   # The basic colors
-  foreground              #C6D0F5
-  background              #303446
-  selection_foreground    #303446
-  selection_background    #F2D5CF
+  foreground              <<tru-colors-list(num=11)>>
+  background              <<tru-colors-list(num=2)>>
+  selection_foreground    <<tru-colors-list(num=11)>>
+  selection_background    <<tru-colors-list(num=5)>>
 
   # Cursor colors
-  cursor                  #F2D5CF
-  cursor_text_color       #303446
+  cursor                  <<tru-colors-list(num=12)>>
+  cursor_text_color       <<tru-colors-list(num=0)>>
 
   # URL underline color when hovering with mouse
-  url_color               #F2D5CF
+  url_color               <<tru-colors-list(num=23)>>
 
   # Kitty window border colors
-  active_border_color     #BABBF1
-  inactive_border_color   #737994
-  bell_border_color       #E5C890
+  active_border_color     <<tru-colors-list(num=24)>>
+  inactive_border_color   <<tru-colors-list(num=3)>>
+  bell_border_color       <<tru-colors-list(num=17)>>
 
   # OS Window titlebar colors
   wayland_titlebar_color system
   macos_titlebar_color system
 
   # Tab bar colors
-  active_tab_foreground   #232634
-  active_tab_background   #CA9EE6
-  inactive_tab_foreground #C6D0F5
-  inactive_tab_background #292C3C
-  tab_bar_background      #232634
+  active_tab_foreground   <<tru-colors-list(num=10)>>
+  active_tab_background   <<tru-colors-list(num=23)>>
+  inactive_tab_foreground <<tru-colors-list(num=10)>>
+  inactive_tab_background <<tru-colors-list(num=3)>>
+  tab_bar_background      <<tru-colors-list(num=0)>>
 
   # Colors for marks (marked text in the terminal)
-  mark1_foreground #303446
-  mark1_background #BABBF1
-  mark2_foreground #303446
-  mark2_background #CA9EE6
-  mark3_foreground #303446
-  mark3_background #85C1DC
+  mark1_foreground <<tru-colors-list(num=23)>>
+  mark1_background <<tru-colors-list(num=2)>>
+  mark2_foreground <<tru-colors-list(num=13)>>
+  mark2_background <<tru-colors-list(num=2)>>
+  mark3_foreground <<tru-colors-list(num=22)>>
+  mark3_background <<tru-colors-list(num=2)>>
 
   # The 16 terminal colors
 
   # black
-  color0 #51576D
-  color8 #626880
+  color0 <<tru-colors-list(num=3)>>
+  color8 <<tru-colors-list(num=4)>>
 
   # red
-  color1 #E78284
-  color9 #E78284
+  color1 <<tru-colors-list(num=12)>>
+  color9 <<tru-colors-list(num=12)>>
 
   # green
-  color2  #A6D189
-  color10 #A6D189
+  color2  <<tru-colors-list(num=19)>>
+  color10 <<tru-colors-list(num=19)>>
 
   # yellow
-  color3  #E5C890
-  color11 #E5C890
+  color3  <<tru-colors-list(num=17)>>
+  color11 <<tru-colors-list(num=17)>>
 
   # blue
-  color4  #8CAAEE
-  color12 #8CAAEE
+  color4  <<tru-colors-list(num=22)>>
+  color12 <<tru-colors-list(num=22)>>
 
   # magenta
-  color5  #F4B8E4
-  color13 #F4B8E4
+  color5  <<tru-colors-list(num=14)>>
+  color13 <<tru-colors-list(num=14)>>
 
   # cyan
-  color6  #81C8BE
-  color14 #81C8BE
+  color6 <<tru-colors-list(num=20)>>
+  color14 <<tru-colors-list(num=20)>>
 
   # white
-  color7  #B5BFE2
-  color15 #A5ADCE
+  color7  <<tru-colors-list(num=09)>>
+  color15 <<tru-colors-list(num=10)>>
+
 #+end_src
