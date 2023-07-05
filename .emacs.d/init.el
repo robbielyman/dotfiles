@@ -11,6 +11,7 @@
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
 
+(setq use-package-compute-statistics t)
 (require 'package)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 (package-initialize)
@@ -19,14 +20,16 @@
   (require 'use-package)
   (setq use-package-always-ensure t))
 
-(unless (package-installed-p 'usepackage)
+(unless (package-installed-p 'use-package)
   (package-refresh-contents)
   (package-install 'use-package))
+
+(when (memq window-system '(mac ns x))
+  (exec-path-from-shell-initialize))
 
 (use-package emacs
   :ensure nil
   :preface
-  (defvar ryl/indent-width 2)
   (defun ryl/check-darwin (filename)
     (if (equal system-type 'darwin) filename "no"))
   (defun ryl/check-linux (filename)
@@ -47,8 +50,7 @@
   (load custom-file)
   (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
   (add-hook 'window-setup-hook 'toggle-frame-maximized t)
-  (setq-default indent-tabs-mode nil
-                tab-width ryl/indent-width)
+  (setq-default indent-tabs-mode nil)
   (set-fringe-mode 10))
 
 (use-package scroll-bar
@@ -56,10 +58,8 @@
 :config (scroll-bar-mode -1))
 
 (use-package evil
-  :init
-  (setq evil-want-C-u-scroll t
-        evil-want-keybinding nil
-        evil-shift-width ryl/indent-width)
+  :custom
+  (evil-want-keybinding nil)
   :hook (after-init . evil-mode)
   :preface
   (defun ryl/save-and-kill-this-buffer ()
@@ -143,9 +143,7 @@
   :ensure nil
   :custom
   (c-default-style '((awk-mode . "awk")
-                     (other . "k&r")))
-  :config
-  (setq-default c-basic-offset ryl/indent-width))
+                     (other . "k&r"))))
 
 (use-package lua-mode
   :ensure nil
@@ -156,8 +154,7 @@
 (use-package python
   :ensure nil
   :mode ("\\.py\\'" . python-mode)
-  :interpreter ("python" . python-mode)
-  :custom (python-indent-offset ryl/indent-width))
+  :interpreter ("python" . python-mode))
 
 (use-package all-the-icons
   :if (display-graphic-p))
@@ -177,6 +174,9 @@
   (dashboard-set-file-icons t))
 
 (use-package org
+  :bind (("C-c l" . org-store-link)
+         ("C-c a" . org-agenda)
+         ("C-c c" . org-capture))
   :mode ("\\.org\\'" . org-mode)
   :hook ((org-mode . visual-line-mode)
          (org-mode . org-indent-mode))
@@ -230,30 +230,49 @@
   (add-to-list 'TeX-expand-list
                '("%sn" (lambda () server-name)))
   (add-to-list 'TeX-view-program-list
-               '(("Zathura"
+               '("Zathura"
                  ("zathura "
                   (mode-io-correlate "--synctex-forward %n:0:\"%b\" -x \"emacsclient --socket-name=%sn +%{line} %{input}\" ")
                   "%o")
-                 "zathura")
-               ("Sioyek"
-                ("sioyek "
-                 (mode-io-correlate "--inverse-search \"emacsclient --socket-name=%sn +%2 %1\" --forward-search-file \"%b\" --forward-search-line %n ")
-                 "%o")
-                "sioyek")))
+                 "zathura"))
+  (add-to-list 'TeX-view-program-list
+               '("Sioyek"
+                 ("sioyek "
+                  (mode-io-correlate "--inverse-search \"emacsclient --socket-name=%sn +%2 %1\" --forward-search-file \"%b\" --forward-search-line %n ")
+                  "%o")
+                 "sioyek"))
   (add-to-list 'TeX-view-program-selection
                '(output-pdf "Sioyek"))
   :custom
   (TeX-PDF-mode t)
   (TeX-source-correlate-mode t)
   (TeX-source-correlate-start-server t)
+  (LaTeX-electric-left-right-brace t)
+  (TeX-electric-math '("$" . "$"))
   (preview-image-type 'dvisvgm))
+
+(eval-after-load "preview"
+  '(add-to-list 'preview-default-preamble "\\PreviewEnvironment{tikzpicture}" t))
+(eval-after-load "preview"
+  '(add-to-list 'preview-default-preamble "\\PreviewEnvironment{tikzcd}" t))
 
 (use-package auctex-latexmk
   :after tex
   :config (auctex-latexmk-setup))
 
 (use-package preview-dvisvgm
+  :custom
+  (preview-dvisvgm-pdf-command
+   "dvisvgm --no-fonts --libgs=/opt/homebrew/opt/ghostscript/lib/libgs.dylib _region_.xdv --page=- --output=\"%m/prev%%3p.svg\"")
   :after tex)
+
+(add-to-list 'load-path "~/Library/Application Support/SuperCollider/downloaded-quarks/scel/el")
+(require 'sclang)
+
+(use-package w3m
+  :defer t)
+
+(use-package zig-mode)
 
 (use-package paren
   :ensure nil
@@ -275,10 +294,14 @@
   :config (add-hook 'with-editor-mode-hook #'evil-insert-state))
 
 (use-package diff-hl
-  :config (global-diff-hl-mode))
+  :config (global-diff-hl-mode)
+  (add-hook 'magit-pre-refresh-hook 'diff-hl-magit-pre-refresh)
+  (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh))
+
 (global-display-line-numbers-mode)
 
 (use-package tramp
+  :defer t
   :config
   (add-to-list 'tramp-methods
                '("yadm"
@@ -334,6 +357,7 @@
     (lsp-snippet-tempel-eglot-init)))
 
 (use-package eglot
+  :defer t
   :ensure nil)
 
 (use-package which-key
@@ -344,7 +368,13 @@
   :config (which-key-mode))
 
 (add-to-list 'custom-theme-load-path "~/src/moire")
-(load-theme 'moire)
+(use-package catppuccin-theme
+  :custom (catppuccin-flavor 'frappe))
+(load-theme 'catppuccin :no-confirm)
+(defun ctp/text-org-blocks ()
+   (face-remap-add-relative 'org-block (list :foreground (catppuccin-get-color 'text))))
+
+(add-hook 'org-mode-hook 'ctp/text-org-blocks)
 (let ((line (face-attribute 'mode-line :underline)))
   (set-face-attribute 'mode-line          nil :overline   line)
   (set-face-attribute 'mode-line-inactive nil :overline   line)
