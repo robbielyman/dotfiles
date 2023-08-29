@@ -39,6 +39,7 @@
   (completion-cycle-threshold 3)
   (read-extended-command-predicate #'command-completion-default-include-p)
   (tab-always-indent 'complete)
+  (tab-width 2)
   (enable-recursive-minibuffers t)
   (scroll-margin 0)
   (scroll-conservatively 101)
@@ -186,9 +187,9 @@
   (org-fontify-quote-and-verse-blocks t)
   (org-publish-project-alist
    '(("ryleelyman.github.io"
-      :base-directory "~/Site/_org"
+      :base-directory "~/Site/org"
       :base-extension "org"
-      :publishing-directory "~/Site/_posts"
+      :publishing-directory "~/Site/content/posts"
       :recursive t
       :publishing-function org-html-publish-to-html
       :headline-levels 4
@@ -271,8 +272,6 @@
 
 (use-package w3m
   :defer t)
-
-(use-package zig-mode)
 
 (use-package paren
   :ensure nil
@@ -358,7 +357,10 @@
 
 (use-package eglot
   :defer t
-  :ensure nil)
+  :ensure nil
+  :config
+  (add-to-list 'eglot-server-programs
+               '((zig-ts-mode :language-id "zig") "zls")))
 
 (use-package which-key
   :custom
@@ -369,8 +371,10 @@
 
 (add-to-list 'custom-theme-load-path "~/src/moire")
 (use-package catppuccin-theme
-  :custom (catppuccin-flavor 'frappe))
-(load-theme 'catppuccin :no-confirm)
+  :custom 
+  (catppuccin-highlight-matches t)
+  (catppuccin-italic-comments t)
+  (catppuccin-italic-variables t))
 (defun ctp/text-org-blocks ()
    (face-remap-add-relative 'org-block (list :foreground (catppuccin-get-color 'text))))
 
@@ -381,3 +385,25 @@
   (set-face-attribute 'mode-line-inactive nil :underline  line)
   (set-face-attribute 'mode-line          nil :box        nil)
   (set-face-attribute 'mode-line-inactive nil :box        nil))
+
+(use-package auto-dark
+  :config (auto-dark-mode t)
+  :custom
+  (auto-dark-dark-theme 'catppuccin)
+  (auto-dark-light-theme 'catppuccin)
+  (auto-dark-dark-mode-hook '((setq catppuccin-flavor 'frappe) (catppuccin-reload)))
+  (auto-dark-light-mode-hook '((setq catppuccin-flavor 'latte) (catppuccin-reload))))
+
+(if (auto-dark--is-dark-mode)
+    (setq catppuccin-flavor 'frappe)
+  (setq catppuccin-flavor 'latte))
+(load-theme 'catppuccin)
+
+(use-package zig-ts-mode
+  :straight (:type git
+             :local-repo "zig-ts-mode"
+             :branch "main"
+             :files (:defaults "*.el")))
+
+(use-package rust-mode)
+(use-package typescript-mode)

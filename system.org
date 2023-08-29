@@ -52,9 +52,6 @@ and =use-package= is a helpful macro system that also supports lazy-loading.
     (exec-path-from-shell-initialize))
 #+end_src
 ** Miscellaneous Settings
-#+begin_src emacs-lisp :tangle ~/.emacs.d/early-init.el
-  (add-to-list 'default-frame-alist '(undecorated . t))
-#+end_src
 
 #+begin_src emacs-lisp
   (use-package emacs
@@ -69,6 +66,7 @@ and =use-package= is a helpful macro system that also supports lazy-loading.
     (completion-cycle-threshold 3)
     (read-extended-command-predicate #'command-completion-default-include-p)
     (tab-always-indent 'complete)
+    (tab-width 2)
     (enable-recursive-minibuffers t)
     (scroll-margin 0)
     (scroll-conservatively 101)
@@ -247,9 +245,9 @@ To be honest, I'm not sure what "awk" and "k&r" styles are precisely...
       (org-fontify-quote-and-verse-blocks t)
       (org-publish-project-alist
        '(("ryleelyman.github.io"
-          :base-directory "~/Site/_org"
+          :base-directory "~/Site/org"
           :base-extension "org"
-          :publishing-directory "~/Site/_posts"
+          :publishing-directory "~/Site/content/posts"
           :recursive t
           :publishing-function org-html-publish-to-html
           :headline-levels 4
@@ -360,11 +358,6 @@ Somehow I'm back to using different PDF viewers on macOS vs Linux. Sigh-oyek.
     :defer t)
 #+end_src
 
-** Zig
-#+begin_src emacs-lisp
-  (use-package zig-mode)
-#+end_src
-
 ** Programming
 *** Parentheses, Pairs
 #+begin_src emacs-lisp
@@ -469,12 +462,15 @@ Also setup yadm, which requires tramp.
     (when (featurep 'eglot)
       (lsp-snippet-tempel-eglot-init)))
 #+end_src
-*** LSP
+*** Eglot
 Do I have to do anything else? Even this at all?
 #+begin_src emacs-lisp
   (use-package eglot
     :defer t
-    :ensure nil)
+    :ensure nil
+    :config
+    (add-to-list 'eglot-server-programs
+                 '((zig-ts-mode :language-id "zig") "zls")))
 #+end_src
 *** Which-Key
 #+begin_src emacs-lisp
@@ -490,8 +486,10 @@ Do I have to do anything else? Even this at all?
 #+begin_src emacs-lisp
   (add-to-list 'custom-theme-load-path "~/src/moire")
   (use-package catppuccin-theme
-    :custom (catppuccin-flavor 'frappe))
-  (load-theme 'catppuccin :no-confirm)
+    :custom 
+    (catppuccin-highlight-matches t)
+    (catppuccin-italic-comments t)
+    (catppuccin-italic-variables t))
   (defun ctp/text-org-blocks ()
      (face-remap-add-relative 'org-block (list :foreground (catppuccin-get-color 'text))))
 
@@ -502,9 +500,36 @@ Do I have to do anything else? Even this at all?
     (set-face-attribute 'mode-line-inactive nil :underline  line)
     (set-face-attribute 'mode-line          nil :box        nil)
     (set-face-attribute 'mode-line-inactive nil :box        nil))
+
+  (use-package auto-dark
+    :config (auto-dark-mode t)
+    :custom
+    (auto-dark-dark-theme 'catppuccin)
+    (auto-dark-light-theme 'catppuccin)
+    (auto-dark-dark-mode-hook '((setq catppuccin-flavor 'frappe) (catppuccin-reload)))
+    (auto-dark-light-mode-hook '((setq catppuccin-flavor 'latte) (catppuccin-reload))))
+
+  (if (auto-dark--is-dark-mode)
+      (setq catppuccin-flavor 'frappe)
+    (setq catppuccin-flavor 'latte))
+  (load-theme 'catppuccin)
     #+end_src
 
-#+RESULTS:
+*** Zig TS Mode
+
+#+begin_src emacs-lisp
+  (use-package zig-ts-mode
+    :straight (:type git
+               :local-repo "zig-ts-mode"
+               :branch "main"
+               :files (:defaults "*.el")))
+#+end_src
+
+*** Tauri Modes
+#+begin_src emacs-lisp
+  (use-package rust-mode)
+  (use-package typescript-mode)
+#+end_src
 
 * Yabai                                                      
 
