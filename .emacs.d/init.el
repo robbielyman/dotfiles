@@ -24,9 +24,6 @@
   (package-refresh-contents)
   (package-install 'use-package))
 
-(when (memq window-system '(mac ns x))
-  (exec-path-from-shell-initialize))
-
 (use-package emacs
   :ensure nil
   :preface
@@ -46,6 +43,7 @@
   (scroll-preserve-screen-position t)
   (auto-window-vscroll nil)
   (set-fringe-mode 10)
+  (next-line-add-newlines t)
   (custom-file "~/.config/emacs-customize.el")
   :init
   (load custom-file)
@@ -57,6 +55,13 @@
 (use-package scroll-bar
 :ensure nil
 :config (scroll-bar-mode -1))
+
+(use-package dumb-jump)
+(add-hook 'xref-backend-functions #'dumb-jump-xref-activate)
+
+(use-package exec-path-from-shell)
+(when (memq window-system '(mac ns x))
+  (exec-path-from-shell-initialize))
 
 (use-package evil
   :custom
@@ -95,7 +100,7 @@
 (global-set-key (kbd "C-M-u") 'universal-argument)
 
 (defvar ryl/default-font-size 130)
-(set-face-attribute 'default nil :weight 'light :family "Iosevka Custom" :height ryl/default-font-size)
+(set-face-attribute 'default nil :weight 'light :family "Iosevka" :height ryl/default-font-size)
 (set-face-attribute 'bold nil :weight 'heavy)
 (set-face-attribute 'fixed-pitch nil :family "Iosevka Custom" :height ryl/default-font-size)
 (set-face-attribute 'variable-pitch nil :family "Avenir Next" :height ryl/default-font-size)
@@ -175,26 +180,26 @@
   (dashboard-set-file-icons t))
 
 (use-package org
-  :bind (("C-c l" . org-store-link)
-         ("C-c a" . org-agenda)
-         ("C-c c" . org-capture))
-  :mode ("\\.org\\'" . org-mode)
-  :hook ((org-mode . visual-line-mode)
-         (org-mode . org-indent-mode))
-  :custom
-  (org-ellipsis " ▾")
-  (org-src-fontify-natively t)
-  (org-fontify-quote-and-verse-blocks t)
-  (org-publish-project-alist
-   '(("ryleelyman.github.io"
-      :base-directory "~/Site/org"
-      :base-extension "org"
-      :publishing-directory "~/Site/content/posts"
-      :recursive t
-      :publishing-function org-html-publish-to-html
-      :headline-levels 4
-      :html-extension "html"
-      :body-only t))))
+    :bind (("C-c l" . org-store-link)
+           ("C-c a" . org-agenda)
+           ("C-c c" . org-capture))
+    :mode ("\\.org\\'" . org-mode)
+    :hook ((org-mode . visual-line-mode)
+           (org-mode . org-indent-mode))
+    :custom
+    (org-ellipsis " ▾")
+    (org-src-fontify-natively t)
+    (org-fontify-quote-and-verse-blocks t)
+    (org-publish-project-alist
+     '(("ryleelyman.github.io"
+        :base-directory "~/Site/org"
+        :base-extension "org"
+        :publishing-directory "~/Site/content/posts"
+        :recursive t
+        :publishing-function org-html-publish-to-html
+        :headline-levels 4
+        :html-extension "html"
+        :body-only t))))
 
 (with-eval-after-load 'org
   (org-babel-do-load-languages
@@ -211,6 +216,10 @@
 (use-package org-bullets
   :hook (org-mode . org-bullets-mode))
 
+(use-package org-journal
+  :custom
+  (org-journal-dir "~/Dropbox/journal")
+  (org-journal-file-type 'weekly))
 
 (defun ryl/org-babel-tangle-config ()
   (when (or (string-equal (buffer-file-name)
@@ -243,7 +252,7 @@
                   "%o")
                  "sioyek"))
   (add-to-list 'TeX-view-program-selection
-               '(output-pdf "Sioyek"))
+               '(output-pdf "Zathura"))
   :custom
   (TeX-PDF-mode t)
   (TeX-source-correlate-mode t)
@@ -263,11 +272,15 @@
 
 (use-package preview-dvisvgm
   :custom
+  (preview-LaTeX-command
+   '("%`xelatex --no-pdf \"\\nonstopmode\\nofiles\\PassOptionsToPackage{"
+     (", " . preview-required-option-list)
+     "}{preview}\\AtBeginDocument{\\ifx\\ifPreview\\undefined" preview-default-preamble"\\fi}\"%' \"\\detokenize{\" %(t-filename-only) \"}\""))
   (preview-dvisvgm-pdf-command
-   "dvisvgm --no-fonts --libgs=/opt/homebrew/opt/ghostscript/lib/libgs.dylib _region_.xdv --page=- --output=\"%m/prev%%3p.svg\"")
+   "dvisvgm --no-fonts --libgs=/usr/lib/libgs.so _region_.xdv --page=- --output=\"%m/prev%%3p.svg\"")
   :after tex)
 
-(add-to-list 'load-path "~/Library/Application Support/SuperCollider/downloaded-quarks/scel/el")
+(add-to-list 'load-path "~/.local/share/SuperCollider/downloaded-quarks/scel/el")
 (require 'sclang)
 
 (use-package w3m

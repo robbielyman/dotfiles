@@ -48,8 +48,6 @@ and =use-package= is a helpful macro system that also supports lazy-loading.
     (package-refresh-contents)
     (package-install 'use-package))
 
-  (when (memq window-system '(mac ns x))
-    (exec-path-from-shell-initialize))
 #+end_src
 ** Miscellaneous Settings
 
@@ -73,6 +71,7 @@ and =use-package= is a helpful macro system that also supports lazy-loading.
     (scroll-preserve-screen-position t)
     (auto-window-vscroll nil)
     (set-fringe-mode 10)
+    (next-line-add-newlines t)
     (custom-file "~/.config/emacs-customize.el")
     :init
     (load custom-file)
@@ -85,6 +84,15 @@ and =use-package= is a helpful macro system that also supports lazy-loading.
   :ensure nil
   :config (scroll-bar-mode -1))
 
+  (use-package dumb-jump)
+  (add-hook 'xref-backend-functions #'dumb-jump-xref-activate)
+
+#+end_src
+
+#+begin_src emacs-lisp
+  (use-package exec-path-from-shell)
+  (when (memq window-system '(mac ns x))
+    (exec-path-from-shell-initialize))
 #+end_src
 
 ** EVIL MODE
@@ -139,7 +147,7 @@ Avenir next might have to be changed on Linux...
 
 #+begin_src emacs-lisp 
   (defvar ryl/default-font-size 130)
-  (set-face-attribute 'default nil :weight 'light :family "Iosevka Custom" :height ryl/default-font-size)
+  (set-face-attribute 'default nil :weight 'light :family "Iosevka" :height ryl/default-font-size)
   (set-face-attribute 'bold nil :weight 'heavy)
   (set-face-attribute 'fixed-pitch nil :family "Iosevka Custom" :height ryl/default-font-size)
   (set-face-attribute 'variable-pitch nil :family "Avenir Next" :height ryl/default-font-size)
@@ -254,31 +262,35 @@ To be honest, I'm not sure what "awk" and "k&r" styles are precisely...
           :html-extension "html"
           :body-only t))))
 
-    (with-eval-after-load 'org
-      (org-babel-do-load-languages
-          'org-babel-load-languages
-          '((emacs-lisp . t)
-            (python . t)
-            (shell . t)
-            (lua . t)))
+  (with-eval-after-load 'org
+    (org-babel-do-load-languages
+        'org-babel-load-languages
+        '((emacs-lisp . t)
+          (python . t)
+          (shell . t)
+          (lua . t)))
 
-      (push '("conf-unix" . conf-unix) org-src-lang-modes))
+    (push '("conf-unix" . conf-unix) org-src-lang-modes))
 
-    (use-package conf-mode)
+  (use-package conf-mode)
 
-    (use-package org-bullets
-      :hook (org-mode . org-bullets-mode))
+  (use-package org-bullets
+    :hook (org-mode . org-bullets-mode))
 
+  (use-package org-journal
+    :custom
+    (org-journal-dir "~/Dropbox/journal")
+    (org-journal-file-type 'weekly))
 
-    (defun ryl/org-babel-tangle-config ()
-      (when (or (string-equal (buffer-file-name)
-                              (expand-file-name "~/system.org"))
-                (string-equal (buffer-file-name)
-                              (expand-file-name "~/src/moire/moire-theme.org")))
-        (let ((org-confirm-babel-evaluate nil))
-          (org-babel-tangle))))
+  (defun ryl/org-babel-tangle-config ()
+    (when (or (string-equal (buffer-file-name)
+                            (expand-file-name "~/system.org"))
+              (string-equal (buffer-file-name)
+                            (expand-file-name "~/src/moire/moire-theme.org")))
+      (let ((org-confirm-babel-evaluate nil))
+        (org-babel-tangle))))
 
-    (add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'ryl/org-babel-tangle-config)))
+  (add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'ryl/org-babel-tangle-config)))
 #+end_src
 
 ** LaTeX
@@ -286,7 +298,7 @@ Somehow I'm back to using different PDF viewers on macOS vs Linux. Sigh-oyek.
 
 #+NAME: LIBGS
 #+begin_src emacs-lisp :tangle no
-  (when (eq system-type 'darwin) "/opt/homebrew/opt/ghostscript/lib/libgs.dylib")
+  (if (eq system-type 'darwin) "/opt/homebrew/opt/ghostscript/lib/libgs.dylib" "/usr/lib/libgs.so")
 #+end_src
 
 #+NAME: PDF-VIEWER
@@ -336,6 +348,10 @@ Somehow I'm back to using different PDF viewers on macOS vs Linux. Sigh-oyek.
 
    (use-package preview-dvisvgm
      :custom
+     (preview-LaTeX-command
+      '("%`xelatex --no-pdf \"\\nonstopmode\\nofiles\\PassOptionsToPackage{"
+        (", " . preview-required-option-list)
+        "}{preview}\\AtBeginDocument{\\ifx\\ifPreview\\undefined" preview-default-preamble"\\fi}\"%' \"\\detokenize{\" %(t-filename-only) \"}\""))
      (preview-dvisvgm-pdf-command
       "dvisvgm --no-fonts --libgs=<<LIBGS()>> _region_.xdv --page=- --output=\"%m/prev%%3p.svg\"")
      :after tex)
@@ -347,7 +363,7 @@ Somehow I'm back to using different PDF viewers on macOS vs Linux. Sigh-oyek.
 #+begin_src emacs-lisp :tangle no
   (if (eq system-type 'darwin)
       "~/Library/Application Support/SuperCollider/downloaded-quarks/scel/el"
-    "")
+    "~/.local/share/SuperCollider/downloaded-quarks/scel/el")
 #+end_src
 
 #+begin_src emacs-lisp :noweb yes
@@ -637,10 +653,10 @@ Do I have to do anything else? Even this at all?
 
   hide_window_decorations yes
 
-  font_family      Iosevka Extended Light 
-  italic_font      Iosevka Extended Light Italic
-  bold_font        Iosevka Heavy Extended 
-  bold_italic_font Iosevka Heavy Extended Italic
+  font_family      Iosevka Light 
+  italic_font      Iosevka Light Italic
+  bold_font        Iosevka Heavy 
+  bold_italic_font Iosevka Heavy Italic
 
   symbol_map U+23fb-23fe,U+2665,U+26a1,U+2b58,U+e000-U+e00a Symbols Nerd Font Mono
   symbol_map U+e0a0-U+e0a3,U+e0b0-U+e0c8,U+e0ca,U+e0cc-U+e0d4 Symbols Nerd Font Mono
