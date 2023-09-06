@@ -76,16 +76,12 @@ and =use-package= is a helpful macro system that also supports lazy-loading.
     :init
     (load custom-file)
     (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
-    (add-hook 'window-setup-hook 'toggle-frame-maximized t)
     (setq-default indent-tabs-mode nil)
     (set-fringe-mode 10))
 
   (use-package scroll-bar
   :ensure nil
   :config (scroll-bar-mode -1))
-
-  (use-package dumb-jump)
-  (add-hook 'xref-backend-functions #'dumb-jump-xref-activate)
 
 #+end_src
 
@@ -146,13 +142,12 @@ arbitrary length ligatures; would be nice to have any number of tildes and dashe
 Avenir next might have to be changed on Linux...
 
 #+begin_src emacs-lisp 
-  (defvar ryl/default-font-size 130)
-  (set-face-attribute 'default nil :weight 'light :family "Iosevka" :height ryl/default-font-size)
-  (set-face-attribute 'bold nil :weight 'heavy)
-  (set-face-attribute 'fixed-pitch nil :family "Iosevka Custom" :height ryl/default-font-size)
-  (set-face-attribute 'variable-pitch nil :family "Avenir Next" :height ryl/default-font-size)
-  (set-frame-width nil 200)
-  (set-frame-height nil 50)
+    (defvar ryl/default-font-size 130)
+    (set-face-attribute 'default nil :weight 'regular :family "Iosevka" :height ryl/default-font-size)
+    (set-face-attribute 'bold nil :weight 'heavy)
+    (set-frame-width nil 100)
+    (set-frame-height nil 50)
+    (set-frame-position nil 400 50)
 
 #+end_src
 
@@ -517,16 +512,20 @@ Do I have to do anything else? Even this at all?
     (set-face-attribute 'mode-line          nil :box        nil)
     (set-face-attribute 'mode-line-inactive nil :box        nil))
 
+  (defun ryl/catppuccin-flavor (flavor) "Set catppuccin flavor to FLAVOR."
+         (setq catppuccin-flavor flavor)
+          (catppuccin-reload))
+
   (use-package auto-dark
     :config (auto-dark-mode t)
+    :hook (auto-dark-dark-mode . (lambda () (ryl/catppuccin-flavor 'mocha)))
+    :hook (auto-dark-light-mode . (lambda () (ryl/catppuccin-flavor 'latte)))
     :custom
     (auto-dark-dark-theme 'catppuccin)
-    (auto-dark-light-theme 'catppuccin)
-    (auto-dark-dark-mode-hook '((setq catppuccin-flavor 'frappe) (catppuccin-reload)))
-    (auto-dark-light-mode-hook '((setq catppuccin-flavor 'latte) (catppuccin-reload))))
+    (auto-dark-light-theme 'catppuccin))
 
   (if (auto-dark--is-dark-mode)
-      (setq catppuccin-flavor 'frappe)
+      (setq catppuccin-flavor 'mocha)
     (setq catppuccin-flavor 'latte))
   (load-theme 'catppuccin)
     #+end_src
@@ -535,10 +534,11 @@ Do I have to do anything else? Even this at all?
 
 #+begin_src emacs-lisp
   (use-package zig-ts-mode
-    :straight (:type git
-               :local-repo "zig-ts-mode"
-               :branch "main"
-               :files (:defaults "*.el")))
+    :straight (zig-ts-mode
+               :type git
+               :host github
+               :repo "ryleelyman/zig-ts-mode"
+               :branch "main"))
 #+end_src
 
 *** Tauri Modes
@@ -650,8 +650,6 @@ Do I have to do anything else? Even this at all?
 #+begin_src conf :tangle "~/.config/kitty/kitty.conf" :noweb yes 
   listen_on unix:/tmp/kitty
   allow_remote_control  yes
-
-  hide_window_decorations yes
 
   font_family      Iosevka Light 
   italic_font      Iosevka Light Italic
