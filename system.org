@@ -83,44 +83,53 @@ and =use-package= is a helpful macro system that also supports lazy-loading.
   :ensure nil
   :config (scroll-bar-mode -1))
 
-#+end_src
-
-#+begin_src emacs-lisp
-  (use-package exec-path-from-shell)
-  (when (memq window-system '(mac ns x))
-    (exec-path-from-shell-initialize))
+  (when (equal system-type 'gnu/linux)
+    (setenv "SHELL" "/bin/bash")
+    (setenv "PATH" "/home/rylee/.local/bin:/home/rylee/bin:/home/rylee/src:/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin:")
+    (add-to-list 'exec-path "/usr/local/bin")
+    (add-to-list 'exec-path "/usr/bin")
+    (add-to-list 'exec-path "/home/rylee/src")
+    (add-to-list 'exec-path "/home/rylee/bin"))
 #+end_src
 
 ** EVIL MODE
 Let's load this quickly so that if other parts of our configuration fail,
-we still have Evil set up.
+we still have Evil set up. Gasp, currently we're not tangling this!
 
 #+begin_src emacs-lisp
-    (use-package evil
-      :custom
-      (evil-want-keybinding nil)
-      :hook (after-init . evil-mode)
-      :preface
-      (defun ryl/save-and-kill-this-buffer ()
-        (interactive)
-        (save-buffer)
-        (kill-this-buffer))
-      :config
-      (with-eval-after-load 'evil-maps
-        (define-key evil-insert-state-map (kbd "C-n") nil)
-        (define-key evil-insert-state-map (kbd "C-p") nil))
-      (evil-ex-define-cmd "q" #'kill-this-buffer)
-      (evil-ex-define-cmd "wq" #'ryl/save-and-kill-this-buffer))
+  (use-package expand-region)
+  (use-package change-inner
+    :bind
+    ("M-i" . change-inner)
+    ("M-o" . change-outer))
+#+end_src
 
-    (use-package evil-collection
-      :after evil-mode
-      :custom evil-collection-company-use-tng nil
-      :config (evil-collection-init))
+#+begin_src emacs-lisp :tangle no
+      (use-package evil
+        :custom
+        (evil-want-keybinding nil)
+        :hook (after-init . evil-mode)
+        :preface
+        (defun ryl/save-and-kill-this-buffer ()
+          (interactive)
+          (save-buffer)
+          (kill-this-buffer))
+        :config
+        (with-eval-after-load 'evil-maps
+          (define-key evil-insert-state-map (kbd "C-n") nil)
+          (define-key evil-insert-state-map (kbd "C-p") nil))
+        (evil-ex-define-cmd "q" #'kill-this-buffer)
+        (evil-ex-define-cmd "wq" #'ryl/save-and-kill-this-buffer))
 
-    (use-package evil-commentary
-      :after evil
-      :diminish
-      :config (evil-commentary-mode +1))
+      (use-package evil-collection
+        :after evil-mode
+        :custom evil-collection-company-use-tng nil
+        :config (evil-collection-init))
+
+      (use-package evil-commentary
+        :after evil
+        :diminish
+        :config (evil-commentary-mode +1))
 #+end_src
 **** TODO What are the keybindings of evil-commentary?
 ** Miscellaneous Continued
@@ -142,12 +151,12 @@ arbitrary length ligatures; would be nice to have any number of tildes and dashe
 Avenir next might have to be changed on Linux...
 
 #+begin_src emacs-lisp 
-    (defvar ryl/default-font-size 130)
+    (defvar ryl/default-font-size 120)
     (set-face-attribute 'default nil :weight 'regular :family "Iosevka" :height ryl/default-font-size)
     (set-face-attribute 'bold nil :weight 'heavy)
     (set-frame-width nil 100)
-    (set-frame-height nil 50)
-    (set-frame-position nil 400 50)
+    (set-frame-height nil 36)
+    (set-frame-position nil 400 20)
 
 #+end_src
 
@@ -293,7 +302,7 @@ Somehow I'm back to using different PDF viewers on macOS vs Linux. Sigh-oyek.
 
 #+NAME: LIBGS
 #+begin_src emacs-lisp :tangle no
-  (if (eq system-type 'darwin) "/opt/homebrew/opt/ghostscript/lib/libgs.dylib" "/usr/lib/libgs.so")
+  (if (eq system-type 'darwin) "/opt/homebrew/opt/ghostscript/lib/libgs.dylib" "/usr/lib64/libgs.so")
 #+end_src
 
 #+NAME: PDF-VIEWER
@@ -348,7 +357,7 @@ Somehow I'm back to using different PDF viewers on macOS vs Linux. Sigh-oyek.
         (", " . preview-required-option-list)
         "}{preview}\\AtBeginDocument{\\ifx\\ifPreview\\undefined" preview-default-preamble"\\fi}\"%' \"\\detokenize{\" %(t-filename-only) \"}\""))
      (preview-dvisvgm-pdf-command
-      "dvisvgm --no-fonts --libgs=<<LIBGS()>> _region_.xdv --page=- --output=\"%m/prev%%3p.svg\"")
+      "dvisvgm --no-fonts _region_.xdv --page=- --output=\"%m/prev%%3p.svg\"")
      :after tex)
 #+end_src
 
@@ -396,16 +405,15 @@ Somehow I'm back to using different PDF viewers on macOS vs Linux. Sigh-oyek.
 
 *** Git
 #+begin_src emacs-lisp
-        (use-package magit
-          :bind ("C-x g" . magit-status)
-          :config (add-hook 'with-editor-mode-hook #'evil-insert-state))
+  (use-package magit
+    :bind ("C-x g" . magit-status))
 
-        (use-package diff-hl
-          :config (global-diff-hl-mode)
-          (add-hook 'magit-pre-refresh-hook 'diff-hl-magit-pre-refresh)
-          (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh))
+  (use-package diff-hl
+    :config (global-diff-hl-mode)
+    (add-hook 'magit-pre-refresh-hook 'diff-hl-magit-pre-refresh)
+    (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh))
 
-        (global-display-line-numbers-mode)
+  (global-display-line-numbers-mode)
 #+end_src
 
 Also setup yadm, which requires tramp.
@@ -547,97 +555,6 @@ Do I have to do anything else? Even this at all?
   (use-package typescript-mode)
 #+end_src
 
-* Yabai                                                      
-
-#+begin_src conf :tangle (ryl/check-darwin ".config/yabai/yabairc")
-    yabai -m config                                 \
-          mouse_follows_focus         off           \
-          focus_follows_mouse         on            \
-          window_origin_display       default       \
-          window_placement            second_child  \
-          window_zoom_persist         on            \
-          window_topmost              off           \
-          window_shadow               on            \
-          window_animation_duration   0.3           \
-          window_animation_frame_rate 120           \
-          window_opacity_duration     0.1           \
-          active_window_opacity       1.0           \
-          normal_window_opacity       0.85          \
-          window_opacity              on            \
-          insert_feedback_color       0xffd75f5f    \
-          window_border               off           \
-          split_ratio                 0.5           \
-          split_type                  auto          \
-          auto_balance                off           \
-          top_padding                 12            \
-          bottom_padding              12            \
-          left_padding                12            \
-          right_padding               12            \
-          window_gap                  35            \
-          layout                      bsp           \
-          mouse_modifier              fn            \
-          mouse_action1               move          \
-          mouse_action2               resize        \
-          mouse_drop_action           swap
-
-#+end_src
-
-* SKHD                                                       
-
-#+begin_src conf :tangle (ryl/check-darwin "~/.config/skhd/skhdrc")
-  :: default
-
-  cmd - return : /Applications/kitty.app/Contents/MacOS/kitty --single-instance -d ~
-
-  cmd - h : yabai -m window --focus west
-  cmd - j : yabai -m window --focus south
-  cmd - k : yabai -m window --focus north
-  cmd - l : yabai -m window --focus east
-
-  shift + cmd - h : yabai -m window --warp west
-  shift + cmd - j : yabai -m window --warp south
-  shift + cmd - k : yabai -m window --warp north
-  shift + cmd - l : yabai -m window --warp east
-
-  cmd - 1 : yabai -m space --focus 1
-  cmd - 2 : yabai -m space --focus 2
-  cmd - 3 : yabai -m space --focus 3
-  cmd - 4 : yabai -m space --focus 4
-  cmd - 5 : yabai -m space --focus 5
-  cmd - 6 : yabai -m space --focus 6
-  cmd - 7 : yabai -m space --focus 7
-  cmd - 8 : yabai -m space --focus 8
-  cmd - 9 : yabai -m space --focus 9
-
-  cmd + shift - 1 : yabai -m window --space 1
-  cmd + shift - 2 : yabai -m window --space 2
-  cmd + shift - 3 : yabai -m window --space 3
-  cmd + shift - 4 : yabai -m window --space 4
-  cmd + shift - 5 : yabai -m window --space 5
-  cmd + shift - 6 : yabai -m window --space 6
-  cmd + shift - 7 : yabai -m window --space 7
-  cmd + shift - 8 : yabai -m window --space 8
-  cmd + shift - 9 : yabai -m window --space 9
-
-  cmd + alt - f : yabai -m window --toggle float
-
-  :: resize @ :
-
-  cmd - escape ; resize
-
-  resize < escape ; default
-
-  resize < left : yabai -m window --resize left:-25:0
-  resize < down : yabai -m window --resize bottom:0:25
-  resize < up : yabai -m window --resize top:0:-25
-  resize < right : yabai -m window --resize right:25:0
-
-  resize < h : yabai -m window --resize left:-25:0
-  resize < j : yabai -m window --resize bottom:0:25
-  resize < k : yabai -m window --resize top:0:-25
-  resize < l : yabai -m window --resize right:25:0
-#+end_src
-
 * Zathura
 
 #+begin_src conf :tangle (ryl/check-linux "~/.config/zathura/zathurarc")
@@ -748,4 +665,10 @@ Do I have to do anything else? Even this at all?
   color7  #B5BFE2
   color15 #A5ADCE
 
+#+end_src
+
+* Sway
+
+#+begin_src conf :tangle (ryl/check-linux "~/.config/sway/config")
+  
 #+end_src
