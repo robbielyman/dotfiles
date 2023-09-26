@@ -70,7 +70,7 @@ and =use-package= is a helpful macro system that also supports lazy-loading.
     (scroll-conservatively 101)
     (scroll-preserve-screen-position t)
     (auto-window-vscroll nil)
-    (set-fringe-mode 10)
+    (set-fringe-mode 30)
     (next-line-add-newlines t)
     (custom-file "~/.config/emacs-customize.el")
     :init
@@ -92,10 +92,6 @@ and =use-package= is a helpful macro system that also supports lazy-loading.
     (add-to-list 'exec-path "/home/rylee/bin"))
 #+end_src
 
-** EVIL MODE
-Let's load this quickly so that if other parts of our configuration fail,
-we still have Evil set up. Gasp, currently we're not tangling this!
-
 #+begin_src emacs-lisp
   (use-package expand-region)
   (use-package change-inner
@@ -104,34 +100,6 @@ we still have Evil set up. Gasp, currently we're not tangling this!
     ("M-o" . change-outer))
 #+end_src
 
-#+begin_src emacs-lisp :tangle no
-      (use-package evil
-        :custom
-        (evil-want-keybinding nil)
-        :hook (after-init . evil-mode)
-        :preface
-        (defun ryl/save-and-kill-this-buffer ()
-          (interactive)
-          (save-buffer)
-          (kill-this-buffer))
-        :config
-        (with-eval-after-load 'evil-maps
-          (define-key evil-insert-state-map (kbd "C-n") nil)
-          (define-key evil-insert-state-map (kbd "C-p") nil))
-        (evil-ex-define-cmd "q" #'kill-this-buffer)
-        (evil-ex-define-cmd "wq" #'ryl/save-and-kill-this-buffer))
-
-      (use-package evil-collection
-        :after evil-mode
-        :custom evil-collection-company-use-tng nil
-        :config (evil-collection-init))
-
-      (use-package evil-commentary
-        :after evil
-        :diminish
-        :config (evil-commentary-mode +1))
-#+end_src
-**** TODO What are the keybindings of evil-commentary?
 ** Miscellaneous Continued
 #+begin_src emacs-lisp
   (use-package diminish
@@ -139,16 +107,13 @@ we still have Evil set up. Gasp, currently we're not tangling this!
 
   (use-package elcord
     :demand t
-    :config (elcord-mode))
-
-  (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
-  (global-set-key (kbd "C-M-u") 'universal-argument)
+    :config (if (equal system-type 'darwin) elcord-mode))
 #+end_src
 ** UI Tweaks
 *** Fonts
 It's sort of a shame that the =ligature= package doesn't appear to let you set
 arbitrary length ligatures; would be nice to have any number of tildes and dashes working.
-Avenir next might have to be changed on Linux...
+
 
 #+begin_src emacs-lisp 
     (defvar ryl/default-font-size 120)
@@ -163,7 +128,7 @@ Avenir next might have to be changed on Linux...
 #+begin_src emacs-lisp
   (use-package ligature
     :config
-    (ligature-set-ligatures 'prog-mode
+    (ligature-set-ligatures t
                             '("<->" "<-->" "<--->" "<---->" "<----->"  "<=>" "<==>" "<===>"
                               "<====>" "<=====>"  "<**>" "<***>" "<****>" "<*****>"
                               "<!--" "<!---"  "<$" "<$>" "$>" "<." "<.>" ".>"
@@ -187,9 +152,10 @@ Avenir next might have to be changed on Linux...
                               ">=>" ">->" ">-->" ">==>" "<=<" "<-<" "<--<" "<==<"  ">>"
                               ">>>" "<<" "<<<"  ":+" ":-" ":=" "+:" "-:" "=:" "=^"
                               "=+" "=-" "=*" "=/" "=%" "^=" "+=" "-=" "*=" "/=" "%="
-                              "/\\" "--" "~~" "---" "~~~" "==" "==="
-                              "-----" "~~~~~" "-----------" "~~~~~~~~~~"
-                              "\\/"  "<>" "<+" "<+>" "+>"))
+                              "/\\" "\\/"  "<>" "<+" "<+>" "+>"))
+    (ligature-set-ligatures t '(("-" (rx (+ "-")))
+                                ("=" (rx (+ "=")))
+                                ("~" (rx (+ "~")))))
     (global-ligature-mode t))
 #+end_src
 *** Mode-Line
@@ -212,7 +178,6 @@ To be honest, I'm not sure what "awk" and "k&r" styles are precisely...
                        (other . "k&r"))))
 
   (use-package lua-mode
-    :ensure nil
     :interpreter ("lua" . lua-mode)
     :custom
     (lua-indent-level 2))
@@ -412,8 +377,6 @@ Somehow I'm back to using different PDF viewers on macOS vs Linux. Sigh-oyek.
     :config (global-diff-hl-mode)
     (add-hook 'magit-pre-refresh-hook 'diff-hl-magit-pre-refresh)
     (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh))
-
-  (global-display-line-numbers-mode)
 #+end_src
 
 Also setup yadm, which requires tramp.

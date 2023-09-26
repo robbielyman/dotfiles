@@ -105,7 +105,8 @@
       (path-separator . ":") (null-device . "/dev/null"))))
  '(custom-file "~/.config/emacs-customize.el")
  '(custom-safe-themes
-   '("26149a1b5de476aa661bbb9c8f79540509c038fbba58c1c719466851c2968464"
+   '("6ca663019600e8e5233bf501c014aa0ec96f94da44124ca7b06d3cf32d6c5e06"
+     "26149a1b5de476aa661bbb9c8f79540509c038fbba58c1c719466851c2968464"
      "f5e666fba0ded6ae9be004314ecf5f7feb605cdb84711b5c5ffd81acfb831183"
      "d761e13c0132ff8ded1e6d78c11da8ab24847181a421a1cb2c7baeb582344fb6"
      "ba7668593f457e1d7eaa496359d442270c0f11716baba30a437b7119157530c2"
