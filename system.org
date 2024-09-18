@@ -1,4 +1,4 @@
-
+2
 * Emacs Configuration
 :PROPERTIES:
 :header-args: :tangle ~/.emacs.d/init.el
@@ -514,17 +514,21 @@ Do I have to do anything else? Even this at all?
 
 *** Zine Modes
 #+begin_src emacs-lisp
-  (use-package zine-mode :load-path "~/src/zine-mode")
-  ;
-  ;  :straight (zine-mode
-  ;             :type git
-  ;             :host github
-  ;             :repo "robbielyman/zine-mode"
-  ;             :branch "main"))
+  (use-package zine-mode
+    :straight (zine-mode
+               :type git
+               :host github
+               :repo "robbielyman/zine-mode"
+               :branch "main"))
 #+end_src
 
 #+begin_src emacs-lisp
-  (use-package ziggy-mode :load-path "~/src/ziggy-mode")
+  (use-package ziggy-mode
+    :straight (zine-mode
+               :type git
+               :host github
+               :repo "robbielyman/ziggy-mode"
+               :branch "main"))
 #+end_src
 
 *** Other Modes 
