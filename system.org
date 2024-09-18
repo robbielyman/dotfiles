@@ -648,9 +648,3 @@ Do I have to do anything else? Even this at all?
   color15 #A5ADCE
 
 #+end_src
-
-* Sway
-
-#+begin_src conf :tangle (ryl/check-linux "~/.config/sway/config")
-  
-#+end_src
