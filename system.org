@@ -252,16 +252,6 @@ To be honest, I'm not sure what "awk" and "k&r" styles are precisely...
   (add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'ryl/org-babel-tangle-config)))
 #+end_src
 
-#+begin_src emacs-lisp
-  (use-package org-novelist
-    :ensure nil
-    :load-path "~/src"
-    :custom
-    (org-novelist-language-tag "en-GB")
-    (org-novelist-author "Robbie Alanza Lyman")
-    (org-novelist-author-email "robbie.alanza@gmail.com"))
-#+end_src
-
 ** LaTeX
 Somehow I'm back to using different PDF viewers on macOS vs Linux. Sigh-oyek.
 
@@ -524,7 +514,7 @@ Do I have to do anything else? Even this at all?
 
 #+begin_src emacs-lisp
   (use-package ziggy-mode
-    :straight (zine-mode
+    :straight (ziggy-mode
                :type git
                :host github
                :repo "robbielyman/ziggy-mode"
