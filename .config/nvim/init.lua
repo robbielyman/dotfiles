@@ -158,6 +158,7 @@ require("lazy").setup({
 			"saghen/blink.cmp",
 		},
 		config = function()
+			vim.lsp.enable("zls")
 			vim.api.nvim_create_autocmd("LspAttach", {
 				group = vim.api.nvim_create_augroup("kickstart-lsp-attach", { clear = true }),
 				callback = function(event)
@@ -269,6 +270,12 @@ require("lazy").setup({
 						Lua = {
 							completion = {
 								callSnippet = "Replace",
+							},
+							format = {
+								defaultConfig = {
+									indent_style = "space",
+									indent_size = 2,
+								},
 							},
 						},
 					},
