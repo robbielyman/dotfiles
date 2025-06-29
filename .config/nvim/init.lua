@@ -173,7 +173,7 @@ require("lazy").setup({
 					map("grD", vim.lsp.buf.declaration, "[G]oto [D]eclaration")
 					map("gO", require("telescope.builtin").lsp_document_symbols, "[O]pen Document Symbols")
 					map("gW", require("telescope.builtin").lsp_workspace_symbols, "Open [W]orkspace Symbols")
-					map("grt", require("telescope.builtin").lps_type_definitions, "[G]oto [T]ype Definition")
+					map("grt", require("telescope.builtin").lsp_type_definitions, "[G]oto [T]ype Definition")
 
 					-- This function resolves a difference between neovim nightly (version 0.11) and stable (version 0.10)
 					---@param client vim.lsp.Client
